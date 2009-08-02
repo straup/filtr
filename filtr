@@ -2,11 +2,11 @@
 # $Id: filtr,v 1.52 2008/05/04 22:33:10 asc Exp $
 
 # package : filtr
-# version : 0.3
+# version : 0.31
 # author : Aaron Straup Cope
 # url : http://aaronland.info/bin/filtr/
 # date : $Date: 2008/05/04 22:33:10 $
-# copyright : Copyright (c) 2005-2007 Aaron Straup Cope. All Rights Reserved.
+# copyright : Copyright (c) 2005-2009 Aaron Straup Cope. All Rights Reserved.
 # license : Perl Artistic License. This is free software, you may use it and
 #           distribute it under the same terms as Perl itself.
 
@@ -15,7 +15,7 @@
 #
 
 NAME="filtr"
-VERSION="0.3"
+VERSION="0.31"
 
 case $1 in
     ''|-h|-help|--help|-u|--usage|'-?')

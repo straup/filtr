@@ -10,6 +10,18 @@
         dc:description          "Changes for filtr" ;
         dcterms:references      <http://aaronland.info/bin/filtr/> .
 
+<http://aaronland.info/bin/filtr/filtr-0.31.tar.gz>
+        dcterms:replaces <http://aaronland.info/bin/filtr/filtr-0.3.tar.gz> ;
+        dcterms:isVersionOf <http://aaronland.info/bin/filtr/> ;
+
+        doap:Version    [
+                        doap:revision     "0.31" ;
+                        doap:created      "2009-08-02" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Updated documentation" ;
+                        ] .
+
 <http://aaronland.info/bin/filtr/filtr-0.3.tar.gz>
         dcterms:replaces <http://aaronland.info/bin/filtr/filtr-0.23.tar.gz> ;
         dcterms:isVersionOf <http://aaronland.info/bin/filtr/> ;
