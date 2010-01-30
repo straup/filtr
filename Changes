@@ -4,7 +4,7 @@
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix doap:    <http://usefulinc.com/ns/doap#> .
 @prefix asc:     <http://aaronland.info/ns/changefile/> .
-                                     
+
 <>
         dc:identifier           "$Id: Changes,v 1.8 2009/08/03 00:30:23 asc Exp $" ;
         dc:description          "Changes for filtr" ;
@@ -15,10 +15,11 @@
         dcterms:isVersionOf <http://aaronland.info/bin/filtr/> ;
 
         doap:Version    [
-                        doap:revision     "0.32" ;
-                        doap:created      "UNRELEASED" ;
+                        doap:revision     "0.4" ;
+                        doap:created      "2010-01-30" ;
                         ];
         asc:changes     [
+                        asc:update        "Use jhead for transferring EXIF, if installed" ;
                         asc:update        "Wrap calls in jpeg.py in a try block" ;
                         ] .
 

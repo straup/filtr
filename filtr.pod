@@ -112,11 +112,11 @@ Try to rationalize input parameters? Hahahaha.
 
 =head1 VERSION
 
-0.31
+0.4
 
 =head1 DATE
 
-$Date: 2008/05/04 22:30:45 $
+$Date: 2009/08/02 17:42:08 $
 
 =head1 AUTHOR
 
