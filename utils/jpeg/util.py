@@ -25,7 +25,7 @@ if sys.byteorder == "big":
 else:
     ENDIAN = "II"
 
-def endian_padd(val, with):
+def endian_padd(val, with=None):
     if ENDIAN == "II":
         return val + with
     return with + val
