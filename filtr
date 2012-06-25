@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # $Id: filtr,v 1.54 2010/01/30 19:23:41 asc Exp $
 
 # package : filtr
@@ -15,7 +15,7 @@ VERSION="0.5"
 case $1 in
     ''|-h|-help|--help|-u|--usage|'-?')
     echo "${NAME} ${VERSION}"
-    echo "Usage: `basename $0` in.jpg out.jpg [filtr|dazd|postr|postcrd|rockstr]"
+    echo "Usage: `basename $0` in.jpg out.jpg [filtr|dazd|postr|postcrd|rockstr|pxl]"
     echo "       `basename $0` in.mp4 out.jpg movr <filter>"
     echo "       `basename $0` in1.jpg in2.jpg heathr <in1-filtr> <in2-filtr> out.jpg"
     echo "       `basename $0` in1.jpg in2.jpg stndpipe <in1-filtr> <in2-filtr> out.jpg"
@@ -174,7 +174,7 @@ fi
 # which filtr is being run?
 
 case $FILTER in
-    postr|postcrd|rockstr|dazd|stndpipe|movr)
+    postr|postcrd|rockstr|dazd|stndpipe|movr|pxl)
     ;;
     heathr)
     FILTER="stndpipe"
@@ -322,6 +322,18 @@ case $FILTER in
         echo "[${FILTER}] generate report ${REPORT}"
         ${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${MASK} ${LOMO} ${OUTPUT} ${REPORT}
     fi
+
+    ;;
+
+    pxl)
+
+    echo "[${FILTER}] triangulize"
+    echo "NOTE: this filtr currently only accepts JPEGs (that's not a feature)"
+
+    ;; sudo make this work with PNGs
+    ;; https://github.com/straup/triangulizor
+
+    ${PYTHON} ${UTILS}/triangulizor.py ${INPUT} ${OUTPUT}
 
     ;;
 
