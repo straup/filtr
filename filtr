@@ -274,14 +274,14 @@ case $FILTER in
     *)
     ${IDENTIFY} ${INPUT} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
 
-    W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-    H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+    export W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+    export H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
 
-    W_THUMB=`awk '{ split($1, dims,"x"); print dims[1] / 10; }' ${ID}`
-    H_THUMB=`awk '{ split($1, dims,"x"); print dims[2] / 10; }' ${ID}`
+    export W_THUMB=`awk '{ split($1, dims,"x"); print dims[1] / 10; }' ${ID}`
+    export H_THUMB=`awk '{ split($1, dims,"x"); print dims[2] / 10; }' ${ID}`
 
-    W_REPORT=`awk '{ split($1, dims,"x"); print dims[1] * .5; }' ${ID}`
-    H_REPORT=`awk '{ split($1, dims,"x"); print dims[2] * .5; }' ${ID}`
+    export W_REPORT=`awk '{ split($1, dims,"x"); print dims[1] * .5; }' ${ID}`
+    export H_REPORT=`awk '{ split($1, dims,"x"); print dims[2] * .5; }' ${ID}`
     ;;
 esac
 
@@ -293,36 +293,15 @@ echo "[startup] process ${INPUT} with ${FILTER} (${FILTR_UID})"
 
 case $FILTER in
 
-    postcrd|postr)
+    postcrd)
 
-    echo "[${FILTER}] create mask"
-    ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -modulate 100,150 -gaussian 1x2 +matte ${INPUT} ${MASK}
+    ${RECIPES}/postcrd.sh
 
-    echo "[${FILTER}] resize mask"
-    ${CONVERT} -resize ${W_ORIG}x${H_ORIG} -gaussian 0x5 -modulate 180,150 ${MASK} ${MASK}
+    ;;
 
-    echo "[${FILTER}] create lomo"
-    ${CONVERT} -unsharp 1.5x1.5 -modulate 175,100 -contrast -contrast -contrast ${INPUT} ${LOMO}
+    postr)
 
-    echo "[${FILTER}] tweak lomo"
-    ${CONVERT} -gaussian 1x2 ${LOMO} ${LOMO}
-
-    echo "[${FILTER}] compose"
-    ${COMPOSITE} -compose multiply ${MASK} ${LOMO} ${NEW}
-
-    if test $FILTER = "postr"
-    then
-        echo "[${FILTER}] recompose"
-        ${COMPOSITE} -compose multiply ${INPUT} ${NEW} ${NEW}
-    fi
-
-    mv -f ${NEW} ${OUTPUT}
-
-    if [ ${DO_REPORT} -gt 0 ] 
-    then
-        echo "[${FILTER}] generate report ${REPORT}"
-        ${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${MASK} ${LOMO} ${OUTPUT} ${REPORT}
-    fi
+    ${RECIPES}/postr.sh
 
     ;;
 
