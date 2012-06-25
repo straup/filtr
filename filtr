@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # $Id: filtr,v 1.54 2010/01/30 19:23:41 asc Exp $
 
 # package : filtr
@@ -34,9 +34,9 @@ echo "[startup] ${OSTYPE} ${PATH}"
 
 # bare-bones input
 
-INPUT=$1
-OUTPUT=$2
-FILTER=$3
+export INPUT=$1
+export OUTPUT=$2
+export FILTER=$3
 
 # bare-bones sanity checking
 
@@ -51,24 +51,25 @@ do
   fi
 done
 
-DO_REPORT=1
-DO_HEATHR=0
+export DO_REPORT=1
+export DO_HEATHR=0
 
 # applications we'll need to do anything
 
-FILTR=$0 
-UTILS=`dirname $0`/utils
-IDENTIFY="identify"
-CONVERT="convert"
-COMPOSITE="composite"
-MONTAGE="montage"
-FFMPEG="ffmpeg"
-PERL="perl"
-PYTHON="python"
-MD5="md5"
-MD5_ARGS="-q"
-GS="gs"
-JHEAD="jhead"
+export FILTR=$0 
+export UTILS=`dirname $0`/utils
+export RECIPES=`dirname $0`/recipes
+export IDENTIFY="identify"
+export CONVERT="convert"
+export COMPOSITE="composite"
+export MONTAGE="montage"
+export FFMPEG="ffmpeg"
+export PERL="perl"
+export PYTHON="python"
+export MD5="md5"
+export MD5_ARGS="-q"
+export GS="gs"
+export JHEAD="jhead"
 
 # prefer graphicsmagick if present, update commands accordingly
 
@@ -76,15 +77,15 @@ if test "`which gm`" != ""
 then
     echo "[startup] found GraphicsMagic -- using that"
 
-    IDENTIFY="gm identify"
-    CONVERT="gm convert"
-    COMPOSITE="gm composite"
-    MONTAGE="gm montage"
+    export IDENTIFY="gm identify"
+    export CONVERT="gm convert"
+    export COMPOSITE="gm composite"
+    export MONTAGE="gm montage"
 fi
 
 if test $OSTYPE = "FreeBSD"
 then
-    MD5_ARGS="-q -r"
+    export MD5_ARGS="-q -r"
 fi
 
 # application support - image crunching
@@ -108,18 +109,18 @@ fi
 
 echo "[startup] checking metadata and related dependencies"
 
-REQUIRE_PYTHON=0
-HAS_JHEAD=0
-HAS_MD5=0
+export REQUIRE_PYTHON=0
+export HAS_JHEAD=0
+export HAS_MD5=0
 
 if test "`which ${JHEAD}`" != ""
 then
-    HAS_JHEAD=1
+    export HAS_JHEAD=1
 fi
 
 if test "`which ${MD5}`" != ""
 then
-    HAS_MD5=1
+    export HAS_MD5=1
 fi
 
 # FIX ME: assign require python if !HAS_JHEAD || !HAS_MD5
@@ -158,7 +159,7 @@ then
     if test "`which gs`" = ""
     then
         echo "[startup] can not find 'gs' -- disabling reporting";
-        DO_REPORT=0
+        export DO_REPORT=0
     fi
 fi
 
@@ -177,11 +178,11 @@ case $FILTER in
     postr|postcrd|rockstr|dazd|stndpipe|movr|pxl)
     ;;
     heathr)
-    FILTER="stndpipe"
-    DO_HEATHR=1
+    export FILTER="stndpipe"
+    export DO_HEATHR=1
     ;;
     *)
-    FILTER="filtr"
+    export FILTER="filtr"
     ;;
 esac
 
@@ -190,13 +191,13 @@ esac
 if [ ${HAS_MD5} -gt 0 ]
 then
     echo "[startup] using local ${MD5}"
-    UID=`${MD5} ${MD5_ARGS} ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
+    export FILTR_UID=`${MD5} ${MD5_ARGS} ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
 else
     echo "[startup] no local md5sum; using utils"
-    UID=`${PYTHON} ${UTILS}/md5sum.py ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
+    export FILTR_UID=`${PYTHON} ${UTILS}/md5sum.py ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
 fi
 
-echo "[startup] input UID is ${UID}"
+echo "[startup] input UID is ${FILTR_UID}"
 
 # tmp/work files
 # FIX ME: get system tempdir
@@ -216,10 +217,10 @@ then
     fi
 fi
 
-ID="${TMP}/${UID}-${FILTER}-id.txt"
-LOMO="${TMP}/${UID}-${FILTER}-lomo.png"
-MASK="${TMP}/${UID}-${FILTER}-mask.png"
-NEW="${TMP}/${UID}-${FILTER}-new.jpg"
+export ID="${TMP}/${FILTR_UID}-${FILTER}-id.txt"
+export LOMO="${TMP}/${FILTR_UID}-${FILTER}-lomo.png"
+export MASK="${TMP}/${FILTR_UID}-${FILTER}-mask.png"
+export NEW="${TMP}/${FILTR_UID}-${FILTER}-new.jpg"
 
 #
 # Report archives
@@ -235,7 +236,7 @@ fi
 
 BASENAME=`echo ${INPUT} | awk '{split($1,parts,"/"); i=0; for (p in parts) { i = i + 1}; print parts[i];}'`
 BASENAME=`echo ${BASENAME} | awk '{split($1,parts,"."); i=0; for (p in parts) { i = i + 1}; print parts[i-1];}'`
-REPORT="${TMP}/${YMD}/${BASENAME}_${UID}-${FILTER}.jpg"
+REPORT="${TMP}/${YMD}/${BASENAME}_${FILTR_UID}-${FILTER}.jpg"
 
 # clean up any old files before we get started
 
@@ -288,7 +289,7 @@ esac
 # Actually do some work
 #
 
-echo "[startup] process ${INPUT} with ${FILTER} (${UID})"
+echo "[startup] process ${INPUT} with ${FILTER} (${FILTR_UID})"
 
 case $FILTER in
 
@@ -327,13 +328,7 @@ case $FILTER in
 
     pxl)
 
-    echo "[${FILTER}] triangulize"
-    echo "NOTE: this filtr currently only accepts JPEGs (that's not a feature)"
-
-    ;; sudo make this work with PNGs
-    ;; https://github.com/straup/triangulizor
-
-    ${PYTHON} ${UTILS}/triangulizor.py ${INPUT} ${OUTPUT}
+    ${RECIPES}/pxl.sh
 
     ;;
 
@@ -441,9 +436,9 @@ case $FILTER in
           
           echo "[${FILTER}][heathr] img canvas ${W_CANVAS} x ${H_CANVAS}"
           
-          CANVAS=${TMP}/${UID}-blank.jpg
-          BG=${TMP}/${UID}-bg.jpg
-          DRAFT=${TMP}/${UID}-draft.jpg
+          CANVAS=${TMP}/${FILTR_UID}-blank.jpg
+          BG=${TMP}/${FILTR_UID}-bg.jpg
+          DRAFT=${TMP}/${FILTR_UID}-draft.jpg
           
           echo "[${FILTER}][heathr] ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}"
           ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
@@ -484,7 +479,7 @@ case $FILTER in
     W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
     H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
 
-    ID2="${TMP}/${UID}-${FILTER}-id2.txt"
+    ID2="${TMP}/${FILTR_UID}-${FILTER}-id2.txt"
     echo "[${FILTER}] ${IDENTIFY} ${INPUT2}  > ${ID2}"
 
     ${IDENTIFY} ${INPUT2} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID2}
@@ -527,8 +522,8 @@ case $FILTER in
 
     echo "[${FILTER}] canvas ${W_CANVAS} x ${H_CANVAS}"
 
-    CANVAS=${TMP}/${UID}-blank.jpg
-    DRAFT=${TMP}/${UID}-draft.jpg
+    CANVAS=${TMP}/${FILTR_UID}-blank.jpg
+    DRAFT=${TMP}/${FILTR_UID}-draft.jpg
 
     ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
 
@@ -557,8 +552,8 @@ case $FILTER in
     movr)
 
     MOVR=$4
-    IDENT=${UID}"-ffmpeg"
-    TMP_FMT=${UID}"-fr%02d.jpg"
+    IDENT=${FILTR_UID}"-ffmpeg"
+    TMP_FMT=${FILTR_UID}"-fr%02d.jpg"
 
     echo "[${FILTER}] movring ${INPUT} (${TMP_FMT})"
 
@@ -568,28 +563,28 @@ case $FILTER in
 
     rm -f ${TMP}/${IDENT}
 
-    for img in `ls ${TMP}/${UID}-fr*.jpg`
+    for img in `ls ${TMP}/${FILTR_UID}-fr*.jpg`
     do
       echo "[${FILTER}][movr] filtring ${img} (${img}.tmp) ${MOVR}"
       ${FILTR} ${img} "${img}.tmp" ${MOVR}
       rm -f ${img}
     done
 
-    ${IDENTIFY} ${TMP}/${UID}-fr01.jpg.tmp | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+    ${IDENTIFY} ${TMP}/${FILTR_UID}-fr01.jpg.tmp | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
 
     W_FRAME=`awk '{ split($1, dims,"x"); print dims[1] / 2; }' ${ID}`
     H_FRAME=`awk '{ split($1, dims,"x"); print dims[2] / 2; }' ${ID}`
 
     echo "[${FILTER}] create ${OUTPUT} : ${W_FRAME} ${H_FRAME} per frame"
 
-    FRAMES=`ls ${TMP}/${UID}-fr*.jpg.tmp | wc -l`    
+    FRAMES=`ls ${TMP}/${FILTR_UID}-fr*.jpg.tmp | wc -l`    
     TILES=`${PERL} -MPOSIX -e 'print POSIX::ceil(sqrt($ARGV[0]));' ${FRAMES}`
 
     echo "[${FILTER}] ${FRAMES} frames makes ${TILES} tiles"
 
-    ${MONTAGE} -geometry ${W_FRAME}x${H_FRAME}+2+2 -tile ${TILES}x -bordercolor black `ls ${TMP}/${UID}-fr*.jpg.tmp` ${OUTPUT}
+    ${MONTAGE} -geometry ${W_FRAME}x${H_FRAME}+2+2 -tile ${TILES}x -bordercolor black `ls ${TMP}/${FILTR_UID}-fr*.jpg.tmp` ${OUTPUT}
 
-    for img in `ls ${TMP}/${UID}-fr*.jpg.tmp`
+    for img in `ls ${TMP}/${FILTR_UID}-fr*.jpg.tmp`
     do
       echo "[${FILTER}] remove frame ${img}"
       rm -f ${img}
