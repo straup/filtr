@@ -2,6 +2,7 @@
 
 import argparse
 from cStringIO import StringIO
+import itertools
 import logging
 import os
 import re
@@ -11,27 +12,45 @@ import urllib2
 try:
     import Image
     import ImageDraw
-except ImportError, e:
-    import PIL.Image as Image
-    import PIL.ImageDraw as ImageDraw
-except Exception, e:
-    raise
+except ImportError:
+    try:
+        import PIL.Image as Image
+        import PIL.ImageDraw as ImageDraw
+    except ImportError:
+        print >> sys.stderr, 'Could not import Python Imaging Library'
+        sys.exit(1)
+
 
 def triangulize(image, tile_size):
     """Processes the given image by breaking it down into tiles of the given
     size and applying a triangular effect to each tile. Returns the processed
     image.
+
+    If tile_size is 0, the tile size will be guessed based on the image
+    size. It will also be adjusted to be divisible by 2 if it is not already.
     """
     assert isinstance(image, Image.Image), type(image)
-    assert isinstance(tile_size, int) and tile_size % 2 == 0
+    assert isinstance(tile_size, int)
+
+    # Make sure we have a usable tile size, by guessing based on image size
+    # and making sure it's a multiple of two.
+    if tile_size == 0:
+        tile_size = guess_tile_size(image)
+    if tile_size % 2 != 0:
+        tile_size = (tile_size / 2) * 2
+
     logging.info('Input image size: %r', image.size)
     logging.info('Tile size: %r', tile_size)
+
     # Preprocess image to make sure it's at a size we can handle
     image = prep_image(image, tile_size)
     logging.info('Prepped image size: %r', image.size)
+
     # Get pixmap (for direct pixel access) and draw objects for the image.
     pix = image.load()
     draw = ImageDraw.Draw(image)
+
+    # Process the image, tile by tile
     for x, y in iter_tiles(image, tile_size):
         process_tile(x, y, tile_size, pix, draw, image)
     return image
@@ -130,30 +149,26 @@ def draw_triangles(tile_x, tile_y, tile_size, split, top_color, bottom_color,
 
 def draw_triangle(a, b, c, color, draw):
     """Draws a triangle with the given vertices in the given color."""
-    draw.polygon([a, b, c], fill=make_color(color))
+    draw.polygon([a, b, c], fill=color)
 
 def get_average_color(colors):
     """Calculate the average color from the list of colors, where each color
     is a 3-tuple of (r, g, b) values.
     """
-    tr, tg, tb = reduce(color_reducer, colors)
+    c = reduce(color_reducer, colors)
     total = len(colors)
-    return tr/total, tg/total, tb/total
+    return tuple(v/total for v in c)
 
-def color_reducer((r1, g1, b1), (r2, g2, b2)):
+def color_reducer(c1, c2):
     """Helper function used to add two colors together when averaging."""
-    return r1+r2, g1+g2, b1+b2
+    return tuple(v1 + v2 for v1, v2 in itertools.izip(c1, c2))
 
-def get_color_dist((r1, g1, b1), (r2, g2, b2)):
+def get_color_dist(c1, c2):
     """Calculates the "distance" between two colors, where the distance is
     another color whose components are the absolute values of the difference
     between each component of the input colors.
     """
-    return (abs(r1-r2), abs(g1-g2), abs(b1-b2))
-
-def make_color((r, g, b)):
-    """Formats a color for use in an ImageDraw method."""
-    return 'rgb(%d, %d, %d)' % (r, g, b)
+    return tuple(abs(v1-v2) for v1, v2 in itertools.izip(c1, c2))
 
 def prep_image(image, tile_size):
     """Takes an image and a tile size and returns a possibly cropped version
@@ -179,6 +194,11 @@ def iter_tiles(image, tile_size):
         for x in xrange(0, w, tile_size):
             yield x, y
 
+def guess_tile_size(image):
+    """Try to pick an appropriate tile size based on the image's size."""
+    # Formula: 5% of the largest dimension of the image
+    return int(max(image.size) * 0.05)
+
 
 if __name__ == '__main__':
 
@@ -194,12 +214,6 @@ if __name__ == '__main__':
             msg = '%r not found' % x
             raise argparse.ArgumentTypeError(msg)
 
-    def even_int(x):
-        x = int(x)
-        if not x % 2 == 0:
-            raise argparse.ArgumentTypeError('must be an even number')
-        return x
-
     arg_parser = argparse.ArgumentParser(
         description='Applies a "triangular pixel" effect to an image.')
     arg_parser.add_argument(
@@ -210,8 +224,8 @@ if __name__ == '__main__':
         type=argparse.FileType('wb'),
         help='Output file (defaults to STDOUT)')
     arg_parser.add_argument(
-        '-t', '--tile-size', type=even_int, default=20,
-        help='Tile size (must be divisible by 2; defaults to 20)')
+        '-t', '--tile-size', type=int, default=0,
+        help='Tile size (should be divisible by 2)')
     arg_parser.add_argument(
         '-v', '--verbose', default=False, action='store_const', const=True,
         help='Verbose output')
@@ -233,6 +247,8 @@ if __name__ == '__main__':
     inbuffer = StringIO(args.infile.read())
     try:
         image = triangulize(Image.open(inbuffer), args.tile_size)
+    except IOError, e:
+        logging.error('Unable to open image: %s', e)
     except KeyboardInterrupt:
         logging.info('Interrupted by user, exiting...')
         sys.exit(1)
