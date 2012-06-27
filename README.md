@@ -1,7 +1,7 @@
 filtr
 ==
 
-**tl;dr: The last stable version of filtr can be found http://aaronland.info/bin/filtr/**
+**tl;dr: The last stable version of filtr can be found at http://aaronland.info/bin/filtr/**
 
 If you're reading this it means that the next version of filtr is still lying on
 the floor in a million pieces. I neglected to make a separate branch when I
