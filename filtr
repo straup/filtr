@@ -200,22 +200,8 @@ fi
 echo "[startup] input UID is ${FILTR_UID}"
 
 # tmp/work files
-# FIX ME: get system tempdir
 
-TMP="${HOME}/.filtr"
-
-if ! [ -d ${TMP} ]
-then
-    echo "[startup] creating ${TMP}"
-    mkdir ${TMP}
-
-    if ! [ -d ${TMP} ]
-    then
-        echo "[startup] failed to create ${TMP}"
-        echo "[startup] exiting"
-        exit 1
-    fi
-fi
+TMP=`mktemp -d`
 
 export ID="${TMP}/${FILTR_UID}-${FILTER}-id.txt"
 export LOMO="${TMP}/${FILTR_UID}-${FILTER}-lomo.png"
@@ -625,4 +611,10 @@ if [ -e ${LOMO} ]
 then
     echo "[cleanup] remove ${LOMO}"
     rm ${LOMO}
+fi
+
+if [ -d ${TMP} ]
+then
+    echo "[cleanup] remove ${TMP}"
+    rm -rf ${TMP}
 fi

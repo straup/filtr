@@ -25,10 +25,10 @@ if sys.byteorder == "big":
 else:
     ENDIAN = "II"
 
-def endian_padd(val, with=None):
+def endian_padd(val, with_this=0):
     if ENDIAN == "II":
-        return val + with
-    return with + val
+        return val + with_this
+    return with_this + val
 
 # should the use of struct be refactored using bit calculation ?
 # TODO: add support for signed data
