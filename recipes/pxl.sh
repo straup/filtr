@@ -2,5 +2,6 @@
 
 echo "[${FILTER}] triangulize ${INPUT} (${OUTPUT})"
 
-${PYTHON} ${UTILS}/triangulizor.py -t 40 ${INPUT} ${OUTPUT}
+# to do: adjust -t based on the size of the photo...
+${PYTHON} ${UTILS}/triangulizor.py -t 24 ${INPUT} ${OUTPUT}
 

@@ -256,4 +256,7 @@ if __name__ == '__main__':
         if args.show:
             image.show()
         else:
-            image.save(args.outfile, 'png')
+            # name, ext = os.path.splitext(args.outfile.name)
+            # ext = ext.replace(os.path.extsep, "")
+            # ext = ext.lower()
+            image.save(args.outfile)

@@ -139,7 +139,7 @@ fi
 
 # application support for movr
 
-if test $FILTER = "movr"
+if [ test $FILTER = "movr" ]
 then
     for app in $FFMPEG $PERL
       do
@@ -586,7 +586,7 @@ then
     echo "[exif] found jhead -- using that to transfer EXIF data"
     ${JHEAD} -te ${INPUT} ${OUTPUT}
 else
-    echo "[exif] transfer EXIF data"
+    echo "[exif] transfer EXIF data using Python"
     ${PYTHON} ${UTILS}/mvexif.py ${INPUT} ${OUTPUT}
 fi
 
