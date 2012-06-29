@@ -51,7 +51,7 @@ do
   fi
 done
 
-DO_REPORT=1
+DO_REPORT=0
 DO_HEATHR=0
 
 # applications we'll need to do anything
@@ -175,7 +175,7 @@ fi
 # which filtr is being run?
 
 case $FILTER in
-    postr|postcrd|rockstr|dazd|stndpipe|movr|pxl)
+    dazd|movr|postr|postcrd|pxl|rockstr|stndpipe|tilt)
     ;;
     heathr)
     FILTER="stndpipe"
@@ -208,16 +208,18 @@ LOMO="${TMP}/${FILTR_UID}-${FILTER}-lomo.png"
 MASK="${TMP}/${FILTR_UID}-${FILTER}-mask.png"
 NEW="${TMP}/${FILTR_UID}-${FILTER}-new.jpg"
 
-#
 # Report archives
-#
 
-YMD=`date "+%Y/%m/%d"`
+if [ ${DO_REPORT} -gt 0 ]
+    then
 
-if ! [ -d ${TMP}/${YMD} ]
-then
-    echo "[startup] creating ${TMP}/${YMD}"
-    mkdir -p ${TMP}/${YMD}
+    YMD=`date "+%Y/%m/%d"`
+
+    if ! [ -d ${TMP}/${YMD} ]
+    then
+	echo "[startup] creating ${TMP}/${YMD}"
+	mkdir -p ${TMP}/${YMD}
+    fi
 fi
 
 BASENAME=`echo ${INPUT} | awk '{split($1,parts,"/"); i=0; for (p in parts) { i = i + 1}; print parts[i];}'`
@@ -277,15 +279,36 @@ echo "[startup] process ${INPUT} with ${FILTER} (${FILTR_UID})"
 
 case $FILTER in
 
-    postcrd)
+    postcrd|postr)
 
-    ${RECIPES}/postcrd.sh
+    echo "[${FILTER}] create mask"
+    ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -modulate 100,150 -gaussian 1x2 +matte ${INPUT} ${MASK}
 
-    ;;
+    echo "[${FILTER}] resize mask"
+    ${CONVERT} -resize ${W_ORIG}x${H_ORIG} -gaussian 0x5 -modulate 180,150 ${MASK} ${MASK}
 
-    postr)
+    echo "[${FILTER}] create lomo"
+    ${CONVERT} -unsharp 1.5x1.5 -modulate 175,100 -contrast -contrast -contrast ${INPUT} ${LOMO}
 
-    ${RECIPES}/postr.sh
+    echo "[${FILTER}] tweak lomo"
+    ${CONVERT} -gaussian 1x2 ${LOMO} ${LOMO}
+
+    echo "[${FILTER}] compose"
+    ${COMPOSITE} -compose multiply ${MASK} ${LOMO} ${NEW}
+
+    if [ $FILTER = "postr" ]
+    then
+	echo "[${FILTER}] recompose"
+	${COMPOSITE} -compose multiply ${INPUT} ${NEW} ${NEW}
+    fi
+
+    mv -f ${NEW} ${OUTPUT}
+
+    if [ ${DO_REPORT} -gt 0 ] 
+    then
+	echo "[${FILTER}] generate report ${REPORT}"
+	${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${MASK} ${LOMO} ${OUTPUT} ${REPORT}
+    fi
 
     ;;
 
@@ -312,6 +335,15 @@ case $FILTER in
         echo "[${FILTER}] generate report ${REPORT}"
         ${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${OUTPUT} ${REPORT}
     fi
+
+    ;;
+
+    tilt)
+
+	echo "[${FILTER}] this does not work yet"
+	exit
+
+	# ${CONVERT} \(${INPUT} -gamma 0.75 -modulate 100,130 -contrast\) \(+clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite ${OUTPUT}
 
     ;;
 
