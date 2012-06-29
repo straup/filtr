@@ -11,6 +11,9 @@ Basically I am trying to take the original filtr application and make it a bit
 more modular and easier to add new recipes to. That work is still happening
 which means things (in this repo) work... until they don't.
 
+Unless you're ready to track all of my changes which have a logic all their own
+you shouldn't use this yet.
+
 filtrs
 ==
 
