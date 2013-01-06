@@ -281,14 +281,17 @@ case $FILTER in
 
     brdl)
 
+    # see also:
+    # http://shorttermmemoryloss.com/portfolio/project/1-pixel-camera/
+
     echo "[{$FILTER}] resize"
 
     BRDLTMP="${TMP}/${FILTR_UID}-${FILTER}-tmp.jpg"
 
     ${CONVERT} -geometry 1x1 ${INPUT} ${BRDLTMP}
-    ${CONVERT} -geometry ${W_ORIG}x${H_ORIG} ${BRDLTMP} ${OUTPUT}
 
     # FIX ME: returns a square not a rectangle (20130106/straup)
+    ${CONVERT} -geometry ${W_ORIG}x${H_ORIG} ${BRDLTMP} ${OUTPUT}
 
     rm ${BRDLTMP}
 
