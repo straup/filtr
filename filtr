@@ -175,7 +175,7 @@ fi
 # which filtr is being run?
 
 case $FILTER in
-    dazd|dthr|dthrpxl|movr|postr|postcrd|pxl|pxldthr|rockstr|stndpipe|tilt)
+    brdl|dazd|dthr|dthrpxl|movr|postr|postcrd|pxl|pxldthr|rockstr|stndpipe|tilt)
     ;;
     heathr)
     FILTER="stndpipe"
@@ -278,6 +278,21 @@ esac
 echo "[startup] process ${INPUT} with ${FILTER} (${FILTR_UID})"
 
 case $FILTER in
+
+    brdl)
+
+    echo "[{$FILTER}] resize"
+
+    BRDLTMP="${TMP}/${FILTR_UID}-${FILTER}-tmp.jpg"
+
+    ${CONVERT} -geometry 1x1 ${INPUT} ${BRDLTMP}
+    ${CONVERT} -geometry ${W_ORIG}x${H_ORIG} ${BRDLTMP} ${OUTPUT}
+
+    # FIX ME: returns a square not a rectangle (20130106/straup)
+
+    rm ${BRDLTMP}
+
+    ;;
 
     postcrd|postr)
 
