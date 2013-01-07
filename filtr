@@ -290,8 +290,8 @@ case $FILTER in
 
     ${CONVERT} -geometry 1x1 ${INPUT} ${BRDLTMP}
 
-    # FIX ME: returns a square not a rectangle (20130106/straup)
-    ${CONVERT} -geometry ${W_ORIG}x${H_ORIG} ${BRDLTMP} ${OUTPUT}
+    # note: http://www.imagemagick.org/Usage/resize/#noaspect
+    ${CONVERT} -resize ${W_ORIG}x${H_ORIG}\! ${BRDLTMP} ${OUTPUT}
 
     rm ${BRDLTMP}
 
