@@ -250,15 +250,7 @@ case $FILTER in
 
     brdl)
 
-    echo "[{$FILTER}] resize"
-
-    BRDLTMP="${TMP}/${FILTR_UID}-${FILTER}-tmp.jpg"
-
-    ${CONVERT} -geometry 1x1 ${INPUT} ${BRDLTMP}
-    # note: http://www.imagemagick.org/Usage/resize/#noaspect
-    ${CONVERT} -resize ${W_ORIG}x${H_ORIG}\! ${BRDLTMP} ${OUTPUT}
-
-    rm ${BRDLTMP}
+    ${UTILS}/brdl.sh ${INPUT} ${OUTPUT}
 
     ;;
 
@@ -333,37 +325,26 @@ case $FILTER in
 
     rockstr)
 
-    echo "[${FILTER}] create output"
-    ${CONVERT} -unsharp 1.5x1.5 -modulate 175,150 -contrast -contrast -contrast ${INPUT} ${OUTPUT}
-
-    echo "[${FILTER}] blur"
-    ${CONVERT} -gaussian 1x2 ${OUTPUT} ${OUTPUT}
-
-    echo "[${FILTER}] grayscale"
-    ${CONVERT} -depth 16 -colorspace GRAY -contrast -sharpen 5x5 ${OUTPUT} ${OUTPUT}
+    ${UTILS}/rockstr.sh ${INPUT} ${OUTPUT}
 
     ;;
 
     dazd)
 
-    echo "[${FILTER}] create output"
-    ${CONVERT} -unsharp 1.5x1.5 -modulate 175,150 -contrast -contrast -contrast ${INPUT} ${OUTPUT}
-
-    echo "[${FILTER}] blur"
-    ${CONVERT} -gaussian 1x2 ${OUTPUT} ${OUTPUT}
+    ${UTILS}/dazd.sh ${INPUT} ${OUTPUT}
 
     ;;
 
     stndpipe)
-
-    echo "THIS IS VERY BROKEN RIGHT NOW..."
-    exit
 
     INPUT2=${OUTPUT}
     HFILTR=$4
     HFILTR2=$5
     OUTPUT=$6
 
+    TMP_INPUT=''
+    TMP_INPUT2=''
+    
     if test ${DO_HEATHR} = "1"
     then
 
@@ -371,7 +352,7 @@ case $FILTER in
         TMP_INPUT2="${TMP}/${FILTR_UID}-${FILTER}-tmp2.jpg"
 
         cp ${INPUT} ${TMP_INPUT}
-        cp ${INPUT} ${TMP_INPUT2}
+        cp ${INPUT2} ${TMP_INPUT2}
 
 	INPUT=$TMP_INPUT
 	INPUT2=$TMP_INPUT2
@@ -380,10 +361,16 @@ case $FILTER in
     for img in ${INPUT} ${INPUT2}
     do
 
+      # BREAK: why does this return a zero-length file?
       echo "[${FILTER}] ${FILTR} ${img} ${img} ${HFILTR}"
+
       ${FILTR} ${img} ${img} ${HFILTR}
       HFILTR=${HFILTR2}
+
     done
+
+    echo ${INPUT}
+    exit
 
     if test ${DO_HEATHR} = "1"
     then
