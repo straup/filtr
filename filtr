@@ -250,7 +250,7 @@ case $FILTER in
 
     brdl)
 
-    ${UTILS}/brdl.sh ${INPUT} ${OUTPUT}
+    ${UTILS}/brdl ${INPUT} ${OUTPUT}
 
     ;;
 
@@ -284,14 +284,14 @@ case $FILTER in
     pxl)
 
     echo "[${FILTER}] triangulizorize"
-    ${PYTHON} ${UTILS}/triangulizor.py -f JPEG ${INPUT} ${OUTPUT}
+    ${UTILS}/pxl ${INPUT} ${OUTPUT}
 
     ;;
 
     dthr)
 
     echo "[${FILTER}] dither"
-    ${PYTHON} ${UTILS}/dither.py ${INPUT} ${OUTPUT}
+    ${UTILS}/dithr ${INPUT} ${OUTPUT}
 
     ;;
 
@@ -325,13 +325,13 @@ case $FILTER in
 
     rockstr)
 
-    ${UTILS}/rockstr.sh ${INPUT} ${OUTPUT}
+    ${UTILS}/rockstr ${INPUT} ${OUTPUT}
 
     ;;
 
     dazd)
 
-    ${UTILS}/dazd.sh ${INPUT} ${OUTPUT}
+    ${UTILS}/dazd ${INPUT} ${OUTPUT}
 
     ;;
 

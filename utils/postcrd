@@ -14,8 +14,12 @@ then
     COMPOSITE="gm composite"
 fi
 
-TMP=`mktemp -d -t postcrd-`
-ID=${TMP}'/postcrd.id'
+TMP=`mktemp -d -t ${FILTER}-`
+ID=${TMP}'/${FILTER}.id'
+
+${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
 
 echo "[${FILTER}] create mask"
 ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -modulate 100,150 -gaussian 1x2 +matte ${INPUT} ${MASK}
