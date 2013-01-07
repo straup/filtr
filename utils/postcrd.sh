@@ -5,6 +5,18 @@ FILTER=postcrd
 INPUT=$1
 OUTPUT=$2
 
+CONVERT="convert"
+COMPOSITE="composite"
+
+if test "`which gm`" != ""
+then
+    CONVERT="gm convert"
+    COMPOSITE="gm composite"
+fi
+
+TMP=`mktemp -d -t postcrd-`
+ID=${TMP}'/postcrd.id'
+
 echo "[${FILTER}] create mask"
 ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -modulate 100,150 -gaussian 1x2 +matte ${INPUT} ${MASK}
 
