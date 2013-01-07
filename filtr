@@ -356,6 +356,9 @@ case $FILTER in
 
     stndpipe)
 
+    echo "THIS IS VERY BROKEN RIGHT NOW..."
+    exit
+
     INPUT2=${OUTPUT}
     HFILTR=$4
     HFILTR2=$5
@@ -364,12 +367,14 @@ case $FILTER in
     if test ${DO_HEATHR} = "1"
     then
 
-        cp ${INPUT} ${INPUT}.tmp
-        INPUT=${INPUT}.tmp
+        TMP_INPUT="${TMP}/${FILTR_UID}-${FILTER}-tmp.jpg"
+        TMP_INPUT2="${TMP}/${FILTR_UID}-${FILTER}-tmp2.jpg"
 
-        cp ${INPUT2} ${INPUT2}.tmp
-        INPUT2=${INPUT2}.tmp
+        cp ${INPUT} ${TMP_INPUT}
+        cp ${INPUT} ${TMP_INPUT2}
 
+	$INPUT=$TMP_INPUT
+	$INPUT2=$TMP_INPUT2
     fi
 
     for img in ${INPUT} ${INPUT2}
