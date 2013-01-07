@@ -51,7 +51,6 @@ do
   fi
 done
 
-DO_REPORT=0
 DO_HEATHR=0
 
 # applications we'll need to do anything
@@ -151,17 +150,6 @@ then
     done
 fi
 
-# App support for reporting
-
-if [ ${DO_REPORT} -gt 0 ]
-then
-    if test "`which gs`" = ""
-    then
-        echo "[startup] can not find 'gs' -- disabling reporting";
-        DO_REPORT=0
-    fi
-fi
-
 # make sure there's a file to work with
 
 if ! [ -e ${INPUT} ]
@@ -207,23 +195,8 @@ LOMO="${TMP}/${FILTR_UID}-${FILTER}-lomo.png"
 MASK="${TMP}/${FILTR_UID}-${FILTER}-mask.png"
 NEW="${TMP}/${FILTR_UID}-${FILTER}-new.jpg"
 
-# Report archives
-
-if [ ${DO_REPORT} -gt 0 ]
-    then
-
-    YMD=`date "+%Y/%m/%d"`
-
-    if ! [ -d ${TMP}/${YMD} ]
-    then
-	echo "[startup] creating ${TMP}/${YMD}"
-	mkdir -p ${TMP}/${YMD}
-    fi
-fi
-
 BASENAME=`echo ${INPUT} | awk '{split($1,parts,"/"); i=0; for (p in parts) { i = i + 1}; print parts[i];}'`
 BASENAME=`echo ${BASENAME} | awk '{split($1,parts,"."); i=0; for (p in parts) { i = i + 1}; print parts[i-1];}'`
-REPORT="${TMP}/${YMD}/${BASENAME}_${FILTR_UID}-${FILTER}.jpg"
 
 # clean up any old files before we get started
 
@@ -264,9 +237,6 @@ case $FILTER in
 
     W_THUMB=`awk '{ split($1, dims,"x"); print dims[1] / 10; }' ${ID}`
     H_THUMB=`awk '{ split($1, dims,"x"); print dims[2] / 10; }' ${ID}`
-
-    W_REPORT=`awk '{ split($1, dims,"x"); print dims[1] * .5; }' ${ID}`
-    H_REPORT=`awk '{ split($1, dims,"x"); print dims[2] * .5; }' ${ID}`
     ;;
 esac
 
@@ -320,12 +290,6 @@ case $FILTER in
     fi
 
     mv -f ${NEW} ${OUTPUT}
-
-    if [ ${DO_REPORT} -gt 0 ] 
-    then
-	echo "[${FILTER}] generate report ${REPORT}"
-	${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${MASK} ${LOMO} ${OUTPUT} ${REPORT}
-    fi
 
     ;;
 
@@ -382,12 +346,6 @@ case $FILTER in
     echo "[${FILTER}] grayscale"
     ${CONVERT} -depth 16 -colorspace GRAY -contrast -sharpen 5x5 ${OUTPUT} ${OUTPUT}
 
-    if [ ${DO_REPORT} -gt 0 ]
-    then
-        echo "[${FILTER}] generate report ${REPORT}"
-        ${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${OUTPUT} ${REPORT}
-    fi
-
     ;;
 
     dazd)
@@ -397,12 +355,6 @@ case $FILTER in
 
     echo "[${FILTER}] blur"
     ${CONVERT} -gaussian 1x2 ${OUTPUT} ${OUTPUT}
-
-    if [ ${DO_REPORT} -gt 0 ]
-    then
-        echo "[${FILTER}] generate report ${REPORT}"
-        ${MONTAGE} -geometry ${W_REPORT}x${H_REPORT}+5+5 -tile 2x2 ${INPUT} ${OUTPUT} ${REPORT}
-    fi
 
     ;;
 

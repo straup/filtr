@@ -14,28 +14,30 @@ which means things (in this repo) work... until they don't.
 Unless you're ready to track all of my changes which have a logic all their own
 you shouldn't use this yet.
 
-filtrs
-==
-
-dazd
+filters
 --
 
-heathr
---
+### filtrs
 
-postr
---
+### brdl
 
-postcrd
---
+### dazd
 
-pxl
---
+### dthr
 
-Apply [Will McCutchen's triangulizor](https://github.com/mccutchen/triangulizor) to   a photo.
+### heathr
 
-rockstr
---
+### postr
+
+### postcrd
+
+### pxl
+
+Apply [Will McCutchen's triangulizor](https://github.com/mccutchen/triangulizor) to  a photo.
+
+### rockstr
+
+### stndpipe
 
 See also:
 ==
