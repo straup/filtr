@@ -373,8 +373,8 @@ case $FILTER in
         cp ${INPUT} ${TMP_INPUT}
         cp ${INPUT} ${TMP_INPUT2}
 
-	$INPUT=$TMP_INPUT
-	$INPUT2=$TMP_INPUT2
+	INPUT=$TMP_INPUT
+	INPUT2=$TMP_INPUT2
     fi
 
     for img in ${INPUT} ${INPUT2}
