@@ -35,7 +35,7 @@ def dither_atk(img):
 
     return new.convert('RGBA')
 
-def dither_python(infile, outfile):
+def dither_python(img):
 
     img = img.convert('L')
 

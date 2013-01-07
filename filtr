@@ -15,7 +15,7 @@ VERSION="0.5"
 case $1 in
     ''|-h|-help|--help|-u|--usage|'-?')
     echo "${NAME} ${VERSION}"
-    echo "Usage: `basename $0` in.jpg out.jpg [filtr|dazd|postr|postcrd|rockstr|pxl|dthr]"
+    echo "Usage: `basename $0` in.jpg out.jpg [brdl|dazd|dthr|filtr|postr|postcrd|pxl|rockstr]"
     echo "       `basename $0` in.mp4 out.jpg movr <filter>"
     echo "       `basename $0` in1.jpg in2.jpg heathr <in1-filtr> <in2-filtr> out.jpg"
     echo "       `basename $0` in1.jpg in2.jpg stndpipe <in1-filtr> <in2-filtr> out.jpg"
@@ -58,7 +58,6 @@ DO_HEATHR=0
 
 FILTR=$0 
 UTILS=`dirname $0`/utils
-RECIPES=`dirname $0`/recipes
 IDENTIFY="identify"
 CONVERT="convert"
 COMPOSITE="composite"
