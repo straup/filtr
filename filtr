@@ -250,15 +250,11 @@ case $FILTER in
 
     brdl)
 
-    # see also:
-    # http://shorttermmemoryloss.com/portfolio/project/1-pixel-camera/
-
     echo "[{$FILTER}] resize"
 
     BRDLTMP="${TMP}/${FILTR_UID}-${FILTER}-tmp.jpg"
 
     ${CONVERT} -geometry 1x1 ${INPUT} ${BRDLTMP}
-
     # note: http://www.imagemagick.org/Usage/resize/#noaspect
     ${CONVERT} -resize ${W_ORIG}x${H_ORIG}\! ${BRDLTMP} ${OUTPUT}
 
@@ -427,9 +423,9 @@ case $FILTER in
           
           echo "[${FILTER}][heathr] img canvas ${W_CANVAS} x ${H_CANVAS}"
           
-          CANVAS=${TMP}/${FILTR_UID}-blank.jpg
-          BG=${TMP}/${FILTR_UID}-bg.jpg
-          DRAFT=${TMP}/${FILTR_UID}-draft.jpg
+          CANVAS=${TMP}/${PID}-blank.jpg
+          BG=${TMP}/${PID}-bg.jpg
+          DRAFT=${TMP}/${PID}-draft.jpg
           
           echo "[${FILTER}][heathr] ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}"
           ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
@@ -440,8 +436,7 @@ case $FILTER in
           ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${img} ${CANVAS} ${DRAFT}
 
           # generate the background
-	  # FIX ME: ensure the background is transparent
-
+          
           W_BG=`awk "BEGIN { print ${W_CANVAS} + 2 }"`
           H_BG=`awk "BEGIN { print ${H_CANVAS} + 2 }"`
 
@@ -460,17 +455,17 @@ case $FILTER in
         done
 
     # /heathr
-
     fi
 
     echo "[${FILTER}]  ${INPUT} ${INPUT2} heathr ${HFILTR} ${OUTPUT}"
+
     echo "[${FILTER}] ${IDENTIFY} ${INPUT}  > ${ID}"
 
     ${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
     W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
     H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
 
-    ID2="${TMP}/${FILTR_UID}-${FILTER}-id2.txt"
+    ID2="${TMP}/${PID}-${FILTER}-id2.txt"
     echo "[${FILTER}] ${IDENTIFY} ${INPUT2}  > ${ID2}"
 
     ${IDENTIFY} ${INPUT2} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID2}
@@ -499,7 +494,9 @@ case $FILTER in
         echo "[${FILTER}] border calc reset : ${BORDER_CALC}"
     fi 
 
+    # 
     # hrm...I *think* this is what I want it to do...
+    # 
 
     BORDER_SIDES=0  #`awk "BEGIN { print ${BORDER_CALC} * .1 }"`
     BORDER_CENTER=`awk "BEGIN { print ${BORDER_CALC} * .005 }"`
@@ -513,8 +510,8 @@ case $FILTER in
 
     echo "[${FILTER}] canvas ${W_CANVAS} x ${H_CANVAS}"
 
-    CANVAS=${TMP}/${FILTR_UID}-blank.jpg
-    DRAFT=${TMP}/${FILTR_UID}-draft.jpg
+    CANVAS=${TMP}/${PID}-blank.jpg
+    DRAFT=${TMP}/${PID}-draft.jpg
 
     ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
 

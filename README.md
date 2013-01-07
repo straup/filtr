@@ -21,6 +21,8 @@ filters
 
 ### brdl
 
+James Bridle's [1 pixel camera](http://shorttermmemoryloss.com/portfolio/project/1-pixel-camera/)
+
 ### dazd
 
 ### dthr
