@@ -1,3 +1,5 @@
+#!/bin/sh
+
     INPUT2=${OUTPUT}
     HFILTR=$4
     HFILTR2=$5

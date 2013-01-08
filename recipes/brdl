@@ -1,7 +1,5 @@
 #!/bin/sh
 
-FILTER=brdl
-
 INPUT=$1
 OUTPUT=$2
 

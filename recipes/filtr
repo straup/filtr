@@ -1,7 +1,5 @@
 #!/bin/sh
 
-FILTER='filtr'
-
 INPUT=$1
 OUTPUT=$2
 
@@ -14,19 +12,15 @@ then
     COMPOSITE="gm composite"
 fi
 
-TMP=`mktemp -d -t ${FILTER}-`
-ID=${TMP}'/${FILTER}.id'
+TMP=`mktemp -d -t filtr-`
+ID=${TMP}'/filtr.id'
 
-echo "[${FILTER}] blur"
 ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -gaussian 1x2 +matte ${INPUT} ${MASK}
 
-echo "[${FILTER}] resize mask"
 ${CONVERT} -resize ${W_ORIG}x${H_ORIG} -gaussian 0x5 -modulate 180,150 ${MASK} ${MASK}
 
-echo "[${FILTER}] create lomo"
 ${CONVERT} -unsharp 1.5x1.5 -contrast -modulate 100,120 ${INPUT} ${LOMO}
 
-echo "[${FILTER}] compose"
 ${COMPOSITE} -compose Multiply ${MASK} ${LOMO} ${NEW}
 
 mv -f ${NEW} ${OUTPUT}

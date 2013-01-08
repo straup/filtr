@@ -1,7 +1,5 @@
 #!/bin/sh
 
-FILTER='pxl'
-
 INPUT=$1
 OUTPUT=$2
 

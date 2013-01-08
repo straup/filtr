@@ -1,7 +1,5 @@
 #!/bin/sh
 
-FILTER='dithr'
-
 INPUT=$1
 OUTPUT=$2
 
@@ -18,5 +16,6 @@ else
 fi
 
 WHEREAMI=`dirname $WHOAMI`
+FILTR=`dirname $WHEREAMI`
 
-${PYTHON} ${WHEREAMI}/dither.py ${INPUT} ${OUTPUT}
+${PYTHON} ${FILTR}/utils/dither.py ${INPUT} ${OUTPUT}
