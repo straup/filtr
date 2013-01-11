@@ -1,67 +1,63 @@
 #!/bin/sh
 
-    INPUT2=${OUTPUT}
-    HFILTR=$4
-    HFILTR2=$5
-    OUTPUT=$6
+INPUT1=$1
+INPUT2=$2
+FILTR1=$3
+FILTR2=$4
+OUTPUT=$5
 
-    TMP_INPUT=''
-    TMP_INPUT2=''
-    
-    if test ${DO_HEATHR} = "1"
+WHOAMI=$0 
+RECIPES=`dirname $WHOAMI`
+UTILS=`dirname $RECIPES`/utils
+
+CONVERT="convert"
+COMPOSITE="composite"
+IDENTIFY="identify"
+
+if test "`which gm`" != ""
+then
+    CONVERT="gm convert"
+    COMPOSITE="gm composite"
+    IDENTIFY="gm identify"
+fi
+
+TMP=`mktemp -d -t stndpip-`
+FILTR_UID=`${UTILS}/md5sum ${INPUT}`
+
+ID="${TMP}/${FILTR_UID}-id.txt"
+
+TMP1="${TMP}/${FILTR_UID}-tmp.jpg"
+TMP2="${TMP}/${FILTR_UID}-tmp2.jpg"
+
+# TO DO: check FILTR1/2 here...
+
+${RECIPES}/${FILTR1} ${INPUT1} ${TMP1}
+${RECIPES}/${FILTR2} ${INPUT2} ${TMP2}
+
+for img in ${TMP1} ${TMP2}
+do
+
+    ${IDENTIFY} ${img} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+    W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+    H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+
+    echo "[${FILTER}][heathr] img dimensions : ${W_IMG} x ${H_IMG}"
+          
+    CROP_TO=${W_IMG}
+    CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
+    CROP_Y=0
+          
+    if [${W_IMG} -gt ${H_IMG}]
     then
-
-        TMP_INPUT="${TMP}/${FILTR_UID}-${FILTER}-tmp.jpg"
-        TMP_INPUT2="${TMP}/${FILTR_UID}-${FILTER}-tmp2.jpg"
-
-        cp ${INPUT} ${TMP_INPUT}
-        cp ${INPUT2} ${TMP_INPUT2}
-
-	INPUT=$TMP_INPUT
-	INPUT2=$TMP_INPUT2
+        CROP_TO=${H_IMG}
+        CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
+        CROP_X=0
     fi
 
-    for img in ${INPUT} ${INPUT2}
-    do
+    echo "[${FILTER}][heathr] ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}"
+    ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}
 
-      # BREAK: why does this return a zero-length file?
-      echo "[${FILTER}] ${FILTR} ${img} ${img} ${HFILTR}"
-
-      ${FILTR} ${img} ${img} ${HFILTR}
-      HFILTR=${HFILTR2}
-
-    done
-
-    echo ${INPUT}
-    exit
-
-    if test ${DO_HEATHR} = "1"
-    then
-
-        for img in ${INPUT} ${INPUT2}
-        do
-
-          ${IDENTIFY} ${img} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
-          W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-          H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
-
-          echo "[${FILTER}][heathr] img dimensions : ${W_IMG} x ${H_IMG}"
-          
-          CROP_TO=${W_IMG}
-          CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
-          CROP_Y=0
-          
-          if [${W_IMG} -gt ${H_IMG}]
-          then
-              CROP_TO=${H_IMG}
-              CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
-              CROP_X=0
-          fi
-
-          echo "[${FILTER}][heathr] ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}"
-          ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}
-
-          echo "[${FILTER}][heathr] ${IDENTIFY} ${img}  > ${ID}"
+    echo "[${FILTER}][heathr] ${IDENTIFY} ${img}  > ${ID}"
 
           ${IDENTIFY} ${img}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
           W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
