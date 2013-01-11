@@ -1,0 +1,26 @@
+#!/bin/sh
+
+INPUT=$1
+
+MD5=`which md5`
+PYTHON=`which python`
+
+MD5_ARGS="-q"
+
+if test $OSTYPE = "FreeBSD"
+then
+    MD5_ARGS="-q -r"
+fi
+
+if test "${MD5}" != ""
+then
+    # echo "using local ${MD5}"
+    SUM=`${MD5} ${MD5_ARGS} ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
+else
+    # echo "[startup] no local md5sum; using utils"
+    SUM=`${PYTHON} ${UTILS}/md5sum.py ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
+fi
+
+echo ${SUM}
+exit
+

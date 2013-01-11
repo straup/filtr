@@ -51,10 +51,6 @@ do
   fi
 done
 
-DO_HEATHR=0
-
-# applications we'll need to do anything
-
 WHOAMI=$0 
 
 UTILS=`dirname $WHOAMI`/utils
@@ -67,91 +63,6 @@ MONTAGE="montage"
 FFMPEG="ffmpeg"
 PERL="perl"
 PYTHON="python"
-MD5="md5"
-MD5_ARGS="-q"
-GS="gs"
-JHEAD="jhead"
-
-# prefer graphicsmagick if present, update commands accordingly
-
-if test "`which gm`" != ""
-then
-    echo "[startup] found GraphicsMagic -- using that"
-
-    IDENTIFY="gm identify"
-    CONVERT="gm convert"
-    COMPOSITE="gm composite"
-    MONTAGE="gm montage"
-fi
-
-if test $OSTYPE = "FreeBSD"
-then
-    MD5_ARGS="-q -r"
-fi
-
-# application support - image crunching
-
-echo "[startup] checking filtr dependencies"
-
-if test "`which gm`" = ""
-then
-    for app in $IDENTIFY $CONVERT $COMPOSITE $MONTAGE 
-    do
-      if test "`which ${app}`" = ""
-      then
-          echo "[startup] can not locate ${app}"
-          echo "[startup] Exiting"
-          exit 1
-      fi
-    done
-fi
-
-# Application support: various
-
-echo "[startup] checking metadata and related dependencies"
-
-REQUIRE_PYTHON=0
-HAS_JHEAD=0
-HAS_MD5=0
-
-if test "`which ${JHEAD}`" != ""
-then
-    HAS_JHEAD=1
-fi
-
-if test "`which ${MD5}`" != ""
-then
-    HAS_MD5=1
-fi
-
-# FIX ME: assign require python if !HAS_JHEAD || !HAS_MD5
-
-if [ ${REQUIRE_PYTHON} -gt 0 ]
-then
-  if test "`which ${app}`" = ""
-  then
-      echo "[startup] can not locate ${app}"
-      echo "[startup] Exiting"
-      exit 1
-  fi
-
-  PYTHONPATH=${UTILS}/lib/py:${PYTHONPATH}
-fi
-
-# application support for movr
-
-if [ $FILTER = "movr" ]
-then
-    for app in $FFMPEG $PERL
-      do
-      	if test "`which ${app}`" = ""
-        then
-            echo "[startup] can not locate ${app} required for 'movr' filtr"
-            echo "[startup] Exiting"
-            exit 1
-        fi
-    done
-fi
 
 # make sure there's a file to work with
 
@@ -305,17 +216,4 @@ case $FILTER in
 
 esac
 
-# TODO: put me in utils/
-
-# EXIF data
-
-# FIX ME: check to see if the file is a JPEG
-
-if [ ${HAS_JHEAD} -gt 0 ]
-then
-    echo "[exif] found jhead -- using that to transfer EXIF data"
-    ${JHEAD} -te ${INPUT} ${OUTPUT}
-else
-    echo "[exif] transfer EXIF data using Python"
-    ${PYTHON} ${UTILS}/mvexif.py ${INPUT} ${OUTPUT}
-fi
+${UTILS}/mvexif ${INPUT} {$OUTPUT}

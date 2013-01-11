@@ -3,6 +3,11 @@
 INPUT=$1
 OUTPUT=$2
 
+WHOAMI=$0 
+RECIPES=`dirname $WHOAMI`
+
+UTILS=`dirname $RECIPES`/utils
+
 CONVERT="convert"
 COMPOSITE="composite"
 IDENTIFY="identify"
@@ -15,12 +20,19 @@ then
 fi
 
 TMP=`mktemp -d -t postcrd-`
-ID=${TMP}'/postcrd.id'
+FILTR_UID=`${UTILS}/md5sum ${INPUT}`
+
+ID="${TMP}/${FILTR_UID}-id.txt"
+LOMO="${TMP}/${FILTR_UID}-lomo.png"
+MASK="${TMP}/${FILTR_UID}-mask.png"
 
 ${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
 
 W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
 H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+
+W_THUMB=`awk '{ split($1, dims,"x"); print dims[1] / 10; }' ${ID}`
+H_THUMB=`awk '{ split($1, dims,"x"); print dims[2] / 10; }' ${ID}`
 
 ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -modulate 100,150 -gaussian 1x2 +matte ${INPUT} ${MASK}
 
@@ -30,4 +42,8 @@ ${CONVERT} -unsharp 1.5x1.5 -modulate 175,100 -contrast -contrast -contrast ${IN
 
 ${CONVERT} -gaussian 1x2 ${LOMO} ${LOMO}
 
-${COMPOSITE} -compose multiply ${MASK} ${LOMO} ${NEW}
+${COMPOSITE} -compose multiply ${MASK} ${LOMO} ${OUTPUT}
+
+rm -f ${ID}
+rm -f ${LOMO}
+rm -f ${MASK} 

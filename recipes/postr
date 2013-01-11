@@ -3,37 +3,16 @@
 INPUT=$1
 OUTPUT=$2
 
-CONVERT="convert"
+WHOAMI=$0 
+RECIPES=`dirname $WHOAMI`
+
 COMPOSITE="composite"
-IDENTIFY="identify"
 
 if test "`which gm`" != ""
 then
-    CONVERT="gm convert"
     COMPOSITE="gm composite"
-    IDENTIFY="gm identify"
 fi
 
-TMP=`mktemp -d -t ${FILTER}-`
-ID=${TMP}'/${FILTER}.id'
+${RECIPES}/postcrd ${INPUT} ${OUTPUT}
 
-${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
-W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
-
-# this is basically just 'postcrd'
-
-${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -modulate 100,150 -gaussian 1x2 +matte ${INPUT} ${MASK}
-
-${CONVERT} -resize ${W_ORIG}x${H_ORIG} -gaussian 0x5 -modulate 180,150 ${MASK} ${MASK}
-
-${CONVERT} -unsharp 1.5x1.5 -modulate 175,100 -contrast -contrast -contrast ${INPUT} ${LOMO}
-
-${CONVERT} -gaussian 1x2 ${LOMO} ${LOMO}
-
-${COMPOSITE} -compose multiply ${MASK} ${LOMO} ${NEW}
-
-# end of 'postcrd'
-
-echo "[${FILTER}] recompose"
 ${COMPOSITE} -compose multiply ${INPUT} ${OUTPUT} ${OUTPUT}

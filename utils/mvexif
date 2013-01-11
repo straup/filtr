@@ -1,0 +1,16 @@
+#!/bin/sh
+
+WHOAMI=$0 
+UTILS=`dirname $WHOAMI`/utils
+
+JHEAD=`which jhead`
+PYTHON=`which python`
+
+if test "${JHEAD}" != ""
+then
+    echo "[exif] found jhead -- using that to transfer EXIF data"
+    ${JHEAD} -te ${INPUT} ${OUTPUT}
+else
+    echo "[exif] transfer EXIF data using Python"
+    ${PYTHON} ${UTILS}/mvexif.py ${INPUT} ${OUTPUT}
+fi
