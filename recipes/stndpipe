@@ -31,8 +31,12 @@ TMP2="${TMP}/${FILTR_UID}-tmp2.jpg"
 
 # TO DO: check FILTR1/2 here...
 
+# Run the filters
+
 ${RECIPES}/${FILTR1} ${INPUT1} ${TMP1}
 ${RECIPES}/${FILTR2} ${INPUT2} ${TMP2}
+
+# Crop the images
 
 for img in ${TMP1} ${TMP2}
 do
