@@ -11,7 +11,7 @@ and all the `filtr` script does is some basic housekeeping around calling them,
 including things like transferring EXIF data from a source image to the newly
 filtered version.
 
-filters
+Filters
 --
 
 All of the examples listed here are also included in the [examples]() folder.
@@ -50,6 +50,9 @@ This is principally used by the `heathr` filtr.
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg heathr dthr pxl ./examples/example-heathr.jpg
 
+If the output file is specified with a `.png` extension then its background
+colour will be transparent.
+
 _Named after the ever fabulous [Heather Champ](http://www.hchamp.com/)._
 
 ### postcrd
@@ -78,14 +81,30 @@ _Named after the ever fabulous [Heather Champ](http://www.hchamp.com/)._
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg ./examples/example-stndpipe.png stndpipe
 
-This is principally used by the `heathr` filtr.
+If the output file is specified with a `.png` extension then its background
+colour will be transparent. This is principally used by the `heathr` filtr.
 
 _These are not included in the `examples` folder because they're so big and it's
 sort of a waste. Take a look at the `example-heathr` images to get a sense of
 how it works._
 
+Dependencies
+--
+
+* Unix – or anything with the equivalent of the standard Unix shell tools
+
+* [ImageMagick](http://www.imagemagick.org/) or [GraphicksMagick](http://www.graphicsmagick.org/)
+
+* [Python](http://www.python.org/)
+
+* [JHead](http://www.sentex.net/~mwandel/jhead/) – optional as there is a
+  (slower) pure-Python equivalent should that be necessary
+
+* The [Atkinson](https://github.com/migurski/atkinson) Python library – optional
+  as there is a (much slower) pure-Python equivalent should that be necessary
+
 See also:
-==
+--
 
 * [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr)
   - the original blog post announcing filtr in 2006
