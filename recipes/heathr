@@ -33,7 +33,7 @@ fi
 
 for f in ${FILTR1} ${FILTR2}
 do
-    if [ ! -f $f ]
+    if [ ! -f ${RECIPES}/${f} ]
     then
 	echo "[${FILTR}] unknown filtr '${f}', exiting"
 	exit

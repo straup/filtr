@@ -15,7 +15,11 @@ else
     WHOAMI=`readlink -f $0`
 fi
 
-WHEREAMI=`dirname $WHOAMI`
-FILTR=`dirname $WHEREAMI`
+FILTR=`basename $WHOAMI`
+RECIPES=`dirname $WHOAMI`
+UTILS=`dirname $RECIPES`/utils
 
-${PYTHON} ${FILTR}/utils/triangulizor.py -f JPEG ${INPUT} ${OUTPUT}
+${PYTHON} ${UTILS}/triangulizor.py -f JPEG ${INPUT} ${OUTPUT}
+
+echo "[${FILTR}] done"
+exit

@@ -1,8 +1,7 @@
 #!/bin/sh
-# $Id: filtr,v 1.54 2010/01/30 19:23:41 asc Exp $
 
 # package : filtr
-# version : 0.5
+# version : 1.0
 # author : Aaron Straup Cope
 # url : http://github.com/straup/filtr
 # copyright : Copyright (c) 2005-2013 Aaron Straup Cope. All Rights Reserved.
@@ -10,15 +9,15 @@
 #           distribute it under the same terms as Perl itself.
 
 NAME="filtr"
-VERSION="0.5"
+VERSION="1.0"
 
 case $1 in
     ''|-h|-help|--help|-u|--usage|'-?')
     echo "${NAME} ${VERSION}"
     echo "Usage: `basename $0` in.jpg out.jpg [brdl|dazd|dthr|filtr|postr|postcrd|pxl|pxldthr|rockstr|stndpipe]"
-    echo "       `basename $0` in.mp4 out.jpg movr <filter>"
+    # echo "       `basename $0` in.mp4 out.jpg movr <filter>"
     echo "       `basename $0` in1.jpg in2.jpg heathr <in1-filtr> <in2-filtr> out.jpg"
-    echo "       `basename $0` in1.jpg in2.jpg stndpipe <in1-filtr> <in2-filtr> out.jpg"
+    # echo "       `basename $0` in1.jpg in2.jpg stndpipe <in1-filtr> <in2-filtr> out.jpg"
     exit 0
     ;;
     *)
@@ -27,10 +26,23 @@ esac
 
 # operating system nonsense
 
-OSTYPE=`uname`
+OS=`uname`
 
 echo "[startup] ${NAME} ${VERSION}"
-echo "[startup] ${OSTYPE} ${PATH}"
+# echo "[startup] ${OS} ${PATH}"
+
+if test $OSTYPE = "FreeBSD"
+then
+    WHOAMI=`realpath $0`
+elif [[ $OSTYPE == darwin* ]]
+then
+    WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
+else
+    WHOAMI=`readlink -f $0`    
+fi
+
+UTILS=`dirname $WHOAMI`/utils
+RECIPES=`dirname $WHOAMI`/recipes
 
 # bare-bones input
 
@@ -51,169 +63,61 @@ do
   fi
 done
 
-WHOAMI=$0 
-
-UTILS=`dirname $WHOAMI`/utils
-RECIPES=`dirname $WHOAMI`/recipes
-
-IDENTIFY="identify"
-CONVERT="convert"
-COMPOSITE="composite"
-MONTAGE="montage"
-FFMPEG="ffmpeg"
-PERL="perl"
-PYTHON="python"
-
-# make sure there's a file to work with
-
-if ! [ -e ${INPUT} ]
-then
-    echo "[startup] can not locate file ${INPUT}"
-    echo "Exiting"
-    exit 1
-fi
-
-# which filtr is being run?
-
-case $FILTER in
-    brdl|dazd|dthr|dthrpxl|movr|postr|postcrd|pxl|pxldthr|rockstr|stndpipe|tilt)
-    ;;
-    heathr)
-    FILTER="stndpipe"
-    DO_HEATHR=1
-    ;;
-    *)
-    FILTER="filtr"
-    ;;
-esac
-
 if [ ! -f ${RECIPES}/${FILTER} ]
 then
-    echo "Can't find recipe for ${FILTER}, exiting"
+    echo "[startup] Can't find recipe for ${FILTER}, exiting"
     exit
-done
-
-# create a unique identifier for the working image
-
-if [ ${HAS_MD5} -gt 0 ]
-then
-    echo "[startup] using local ${MD5}"
-    FILTR_UID=`${MD5} ${MD5_ARGS} ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
-else
-    echo "[startup] no local md5sum; using utils"
-    FILTR_UID=`${PYTHON} ${UTILS}/md5sum.py ${INPUT} | awk '{split($1, parts, " "); print parts[1]; }'`
 fi
 
-echo "[startup] input UID is ${FILTR_UID}"
-
-# tmp/work files
-
-TMP=`mktemp -d -t ${FILTR_UID}XXXXXXXXXX`
-
-ID="${TMP}/${FILTR_UID}-${FILTER}-id.txt"
-LOMO="${TMP}/${FILTR_UID}-${FILTER}-lomo.png"
-MASK="${TMP}/${FILTR_UID}-${FILTER}-mask.png"
-NEW="${TMP}/${FILTR_UID}-${FILTER}-new.jpg"
-
-BASENAME=`echo ${INPUT} | awk '{split($1,parts,"/"); i=0; for (p in parts) { i = i + 1}; print parts[i];}'`
-BASENAME=`echo ${BASENAME} | awk '{split($1,parts,"."); i=0; for (p in parts) { i = i + 1}; print parts[i-1];}'`
-
-# Figure out dimensions (unless we're video)
-
-case $FILTER in
-    movr)
-    ;;
-    *)
-    ${IDENTIFY} ${INPUT} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
-
-    W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-    H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
-
-    W_THUMB=`awk '{ split($1, dims,"x"); print dims[1] / 10; }' ${ID}`
-    H_THUMB=`awk '{ split($1, dims,"x"); print dims[2] / 10; }' ${ID}`
-    ;;
-esac
-
-#
-# Actually do some work
-#
-
-echo "[startup] process ${INPUT} with ${FILTER} (${FILTR_UID})"
+echo "[startup] '${FILTER}' filter GO!"
 
 case $FILTER in
 
-    brdl)
+    heathr)
+	INPUT1=$1
+	INPUT2=$2
+	FILTR1=$4
+	FILTR2=$5
+	OUTPUT=$6
+	
+	${RECIPES}/${FILTER} ${INPUT1} ${INPUT2} ${FILTR1} ${FILTR2} ${OUTPUT}
+	;;
 
-    ${RECIPES}/brdl ${INPUT} ${OUTPUT}
-
-    ;;
-
-    postcrd|postr)
-
-    # See this: it's basically what the whole thing should look like...
-    ${RECIPES}/${FILTER} ${INPUT} ${OUTPUT}
-
-    ;;
-
-    pxl)
-
-    ${RECIPES}/pxl ${INPUT} ${OUTPUT}
-
-    ;;
-
-    dthr)
-
-    ${RECIPES}/dithr ${INPUT} ${OUTPUT}
-
-    ;;
-
+    stndpipe|edwn)
+	INPUT1=$1
+	INPUT2=$2
+	OUTPUT=$3
+	
+	${RECIPES}/${FILTER} ${INPUT1} ${INPUT2} ${OUTPUT}
+	;;	
+	
     pxldthr)
-
-    ${PYTHON} ${RECIPES}/pxl ${INPUT} ${OUTPUT}
-    ${PYTHON} ${RECIPES}/dthr ${OUTPUT} ${OUTPUT}
-
-    ;;
+	${PYTHON} ${RECIPES}/pxl ${INPUT} ${OUTPUT}
+	${PYTHON} ${RECIPES}/dthr ${OUTPUT} ${OUTPUT}
+	;;
 
     dthrpxl)
-
-    ${PYTHON} ${RECIPES}/dthr ${INPUT} ${OUTPUT}
-    ${PYTHON} ${RECIPES}/pxl ${OUTPUT} ${OUTPUT}
-
-    ;;
-
-    rockstr)
-
-    ${RECIPES}/rockstr ${INPUT} ${OUTPUT}
-
-    ;;
-
-    dazd)
-
-    ${RECIPES}/dazd ${INPUT} ${OUTPUT}
-
-    ;;
-
-    stndpipe)
-
-    echo "FIX ME"
-    # ${RECIPES}/standpipe ${INPUT} ${OUTPUT}
-	
-    ;;
-
-    movr)
-
-    echo "FIX ME"
-    # ${RECIPES}/movr ${INPUT} ${OUTPUT}
-
-    ;;
+	${PYTHON} ${RECIPES}/dthr ${INPUT} ${OUTPUT}
+	${PYTHON} ${RECIPES}/pxl ${OUTPUT} ${OUTPUT}
+	;;
 
     *)
-
-    echo "FIX ME"
-    # ${RECIPES}/filtr ${INPUT} ${OUTPUT}
-
-    ;;
-
+	${RECIPES}/${FILTER} ${INPUT} ${OUTPUT}
+	;;
 esac
 
-${UTILS}/mvexif ${INPUT} {$OUTPUT}
+echo "[startup] transfer exif data"
+
+case $FILTER in
+
+    heathr|stndpipe|edwn)
+	echo "E_EXCESSIVE_EXIF: multiple input files"
+	;;
+
+    *)
+	${UTILS}/mvexif ${INPUT} ${OUTPUT}
+	;;
+esac
+
+echo "[startup] done"
+exit

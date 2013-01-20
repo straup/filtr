@@ -1,6 +1,28 @@
 filtr
 ==
 
+1.0
+--
+
+2013
+
+### Comments
+
+* The new new. TBW.
+
+### Updates
+
+* The `stndpipe` filter no longer accepts filters (at least for now).
+
+0.5
+--
+
+2010 - 2013
+
+### Comments
+
+* The wandering years.
+
 0.4
 --
 
