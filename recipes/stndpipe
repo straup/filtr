@@ -2,11 +2,23 @@
 
 INPUT1=$1
 INPUT2=$2
-FILTR1=$3
-FILTR2=$4
-OUTPUT=$5
+OUTPUT=$3
 
-WHOAMI=$0 
+if test $OSTYPE = "FreeBSD"
+then
+    WHOAMI=`realpath $0`
+elif [[ $OSTYPE == darwin* ]]
+then
+    WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
+else
+    WHOAMI=`readlink -f $0`    
+fi
+
+FILTR=`basename $WHOAMI`
+RECIPES=`dirname $WHOAMI`
+UTILS=`dirname $RECIPES`/utils
+
+FILTR=`basename $WHOAMI`
 RECIPES=`dirname $WHOAMI`
 UTILS=`dirname $RECIPES`/utils
 
@@ -21,171 +33,69 @@ then
     IDENTIFY="gm identify"
 fi
 
-TMP=`mktemp -d -t stndpip-`
+TMP=`mktemp -d -t $FILTR-`
 FILTR_UID=`${UTILS}/md5sum ${INPUT}`
 
 ID="${TMP}/${FILTR_UID}-id.txt"
+ID2="${TMP}/${FILTR_UID}-id2.txt"
 
-TMP1="${TMP}/${FILTR_UID}-tmp.jpg"
-TMP2="${TMP}/${FILTR_UID}-tmp2.jpg"
+CANVAS=${TMP}/${FILTR_UID}-blank.jpg
+DRAFT=${TMP}/${FILTR_UID}-draft.jpg
 
-# TO DO: check FILTR1/2 here...
+${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
 
-# Run the filters
+${IDENTIFY} ${INPUT2} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID2}
+W_ORIG2=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID2}`
+H_ORIG2=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID2}`
 
-${RECIPES}/${FILTR1} ${INPUT1} ${TMP1}
-${RECIPES}/${FILTR2} ${INPUT2} ${TMP2}
+echo "[${FILTR}] dimensions : ${W_ORIG2} x ${H_ORIG2}"
 
-# Crop the images
+W_NEW=`awk "BEGIN{ print ${W_ORIG}+${W_ORIG2} }"`
+H_NEW=${H_ORIG}
 
-for img in ${TMP1} ${TMP2}
-do
+if [ ${H_ORIG2} -gt ${H_ORIG} ]
+then
+    H_NEW=${H_ORIG2}
+fi 
 
-    ${IDENTIFY} ${img} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
-    W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-    H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+echo "[${FILTR}] dimensions : ${W_NEW} x ${H_NEW}"
 
-    echo "[${FILTER}][heathr] img dimensions : ${W_IMG} x ${H_IMG}"
-          
-    CROP_TO=${W_IMG}
-    CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
-    CROP_Y=0
-          
-    if [${W_IMG} -gt ${H_IMG}]
-    then
-        CROP_TO=${H_IMG}
-        CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
-        CROP_X=0
-    fi
+BORDER_CALC=${W_NEW}
+echo "[${FILTR}] border calc : ${BORDER_CALC}"
 
-    echo "[${FILTER}][heathr] ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}"
-    ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}
+if [ ${H_NEW} -gt ${W_NEW} ]
+then
+    BORDER_CALC=${H_NEW}
+    echo "[${FILTR}] border calc reset : ${BORDER_CALC}"
+fi 
 
-    echo "[${FILTER}][heathr] ${IDENTIFY} ${img}  > ${ID}"
+BORDER_SIDES=0  #`awk "BEGIN { print ${BORDER_CALC} * .1 }"`
+BORDER_CENTER=`awk "BEGIN { print ${BORDER_CALC} * .005 }"`
+BORDER_TOP=0    #`awk "BEGIN { print ${BORDER_CALC} * .1 }"`
+BORDER_BOTTOM=0 #`awk "BEGIN { print ${BORDER_CALC} * .15 }"`
 
-          ${IDENTIFY} ${img}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
-          W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-          H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+echo "[${FILTR}] borders ${BORDER_SIDES} ; ${BORDER_CENTER} ; ${BORDER_TOP} ; ${BORDER_BOTTOM}"
 
-          BORDER_SIDES=`awk "BEGIN { print ${W_IMG} * .1 }"`
-          BORDER_TOP=`awk "BEGIN { print ${H_IMG} * .1 }"`
-          BORDER_BOTTOM=`awk "BEGIN { print ${H_IMG} * .3 }"`
+W_CANVAS=`awk "BEGIN { print ${W_NEW} + (${BORDER_SIDES} * 2) + ${BORDER_CENTER} }"`
+H_CANVAS=`awk "BEGIN { print ${BORDER_TOP} + ${H_NEW} + ${BORDER_BOTTOM} }"`
 
-          echo "[${FILTER}][heathr] img borders ${BORDER_SIDES} ; ${BORDER_TOP} ; ${BORDER_BOTTOM}"
-          
-          W_CANVAS=`awk "BEGIN { print ${W_IMG} + (${BORDER_SIDES} * 2) }"`
-          H_CANVAS=`awk "BEGIN { print ${BORDER_TOP} + ${H_IMG} + ${BORDER_BOTTOM} }"`
-          
-          echo "[${FILTER}][heathr] img canvas ${W_CANVAS} x ${H_CANVAS}"
-          
-          CANVAS=${TMP}/${PID}-blank.jpg
-          BG=${TMP}/${PID}-bg.jpg
-          DRAFT=${TMP}/${PID}-draft.jpg
-          
-          echo "[${FILTER}][heathr] ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}"
-          ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
-          
-          # composite
-          
-          echo "[${FILTER}][heathr] ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${img} ${CANVAS} ${DRAFT}"
-          ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${img} ${CANVAS} ${DRAFT}
+echo "[${FILTR}] canvas ${W_CANVAS} x ${H_CANVAS}"
 
-          # generate the background
-          
-          W_BG=`awk "BEGIN { print ${W_CANVAS} + 2 }"`
-          H_BG=`awk "BEGIN { print ${H_CANVAS} + 2 }"`
+${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
 
-          echo "[${FILTER}][heathr] ${CONVERT} -size ${W_BG}x${H_BG} xc:black ${BG}"
-          ${CONVERT} -size ${W_BG}x${H_BG} xc:black ${BG}
-          
-          # place the composite on the background
-          
-          echo "[${FILTER}][heathr] ${COMPOSITE} -geometry +1+1 ${DRAFT} ${BG} ${img}"
-          ${COMPOSITE} -geometry +1+1 ${DRAFT} ${BG} ${img}         
-          
-          rm -f ${ID}
-          rm -f ${DRAFT}
-          rm -f ${CANVAS}
-          rm -f ${BG}
-        done
+W_OFFSET=`awk "BEGIN { print ${W_ORIG} + ${BORDER_SIDES} + ${BORDER_CENTER} }"`
 
-    # /heathr
-    fi
+echo "[${FILTR}] ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${INPUT} ${CANVAS} ${DRAFT}"
+${COMPOSITE} -quality 100 -geometry +${BORDER_SIDES}+${BORDER_TOP} ${INPUT} ${CANVAS} ${DRAFT}
 
-    echo "[${FILTER}]  ${INPUT} ${INPUT2} heathr ${HFILTR} ${OUTPUT}"
+echo "[${FILTR}] ${COMPOSITE} -geometry +${W_OFFSET}+${BORDER_TOP} ${INPUT2} ${DRAFT} ${OUTPUT}"
+${COMPOSITE} -quality 100 -geometry +${W_OFFSET}+${BORDER_TOP} ${INPUT2} ${DRAFT} ${OUTPUT}
 
-    echo "[${FILTER}] ${IDENTIFY} ${INPUT}  > ${ID}"
+echo "[${FILTR}] done!"
 
-    ${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
-    W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
-    H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
-
-    ID2="${TMP}/${PID}-${FILTER}-id2.txt"
-    echo "[${FILTER}] ${IDENTIFY} ${INPUT2}  > ${ID2}"
-
-    ${IDENTIFY} ${INPUT2} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID2}
-    W_ORIG2=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID2}`
-    H_ORIG2=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID2}`
-
-    echo "[${FILTER}] dimensions : ${W_ORIG2} x ${H_ORIG2}"
-
-    W_HEATHR=`awk "BEGIN{ print ${W_ORIG}+${W_ORIG2} }"`
-
-    H_HEATHR=${H_ORIG}
-
-    if [ ${H_ORIG2} -gt ${H_ORIG} ]
-    then
-        H_HEATHR=${H_ORIG2}
-    fi 
-
-    echo "[${FILTER}] dims : ${W_HEATHR} x ${H_HEATHR}"
-
-    BORDER_CALC=${W_HEATHR}
-    echo "[${FILTER}] border calc : ${BORDER_CALC}"
-
-    if [ ${H_HEATHR} -gt ${W_HEATHR} ]
-    then
-        BORDER_CALC=${H_HEATHR}
-        echo "[${FILTER}] border calc reset : ${BORDER_CALC}"
-    fi 
-
-    # 
-    # hrm...I *think* this is what I want it to do...
-    # 
-
-    BORDER_SIDES=0  #`awk "BEGIN { print ${BORDER_CALC} * .1 }"`
-    BORDER_CENTER=`awk "BEGIN { print ${BORDER_CALC} * .005 }"`
-    BORDER_TOP=0    #`awk "BEGIN { print ${BORDER_CALC} * .1 }"`
-    BORDER_BOTTOM=0 #`awk "BEGIN { print ${BORDER_CALC} * .15 }"`
-
-    echo "[${FILTER}] borders ${BORDER_SIDES} ; ${BORDER_CENTER} ; ${BORDER_TOP} ; ${BORDER_BOTTOM}"
-
-    W_CANVAS=`awk "BEGIN { print ${W_HEATHR} + (${BORDER_SIDES} * 2) + ${BORDER_CENTER} }"`
-    H_CANVAS=`awk "BEGIN { print ${BORDER_TOP} + ${H_HEATHR} + ${BORDER_BOTTOM} }"`
-
-    echo "[${FILTER}] canvas ${W_CANVAS} x ${H_CANVAS}"
-
-    CANVAS=${TMP}/${PID}-blank.jpg
-    DRAFT=${TMP}/${PID}-draft.jpg
-
-    ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
-
-    W_OFFSET=`awk "BEGIN { print ${W_ORIG} + ${BORDER_SIDES} + ${BORDER_CENTER} }"`
-
-    echo "[${FILTER}] ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${INPUT} ${CANVAS} ${DRAFT}"
-    ${COMPOSITE} -quality 100 -geometry +${BORDER_SIDES}+${BORDER_TOP} ${INPUT} ${CANVAS} ${DRAFT}
-
-    echo "[${FILTER}] ${COMPOSITE} -geometry +${W_OFFSET}+${BORDER_TOP} ${INPUT2} ${DRAFT} ${OUTPUT}"
-    ${COMPOSITE} -quality 100 -geometry +${W_OFFSET}+${BORDER_TOP} ${INPUT2} ${DRAFT} ${OUTPUT}
-
-    echo "[${FILTER}] done!"
-
-    rm -f ${CANVAS}
-    rm -f ${DRAFT}
-    rm -f ${ID2}
-
-    if test ${DO_HEATHR} = "1"
-    then
-        rm -f ${INPUT}
-        rm -f ${INPUT2}
-    fi
+rm -f ${ID}
+rm -f ${ID2}
+rm -f ${CANVAS}
+rm -f ${DRAFT}
