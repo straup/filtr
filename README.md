@@ -1,43 +1,67 @@
 filtr
 ==
 
-**tl;dr: The last stable version of filtr can be found at http://aaronland.info/bin/filtr/**
+filtr is a command-line tool for applying filters to pictures.
 
-If you're reading this it means that the next version of filtr is still lying on
-the floor in a million pieces. I neglected to make a separate branch when I
-started and now there's just stuff all over the place. Sorry about that.
+filtr is a wrapper around a lot of smaller pieces most notably [ImageMagick]()
+or [GraphicksMagick](), neither of which are very small.
 
-Basically I am trying to take the original filtr application and make it a bit
-more modular and easier to add new recipes to. That work is still happening
-which means things (in this repo) work... until they don't.
-
-Unless you're ready to track all of my changes which have a logic all their own
-you shouldn't use this yet.
+Individual filters are defined as "recipes" (which can be invoked on their own)
+and all the `filtr` script does is some basic housekeeping around calling them,
+including things like transferring EXIF data from a source image to the newly
+filtered version.
 
 filters
 --
-
-### filtrs
 
 ### brdl
 
 James Bridle's [1 pixel camera](http://shorttermmemoryloss.com/portfolio/project/1-pixel-camera/)
 
+	$> ./filtr ./examples/example-1.jpg ./examples/example-brdl.jpg brdl
+
 ### dazd
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-dazd.jpg dazd
 
 ### dthr
 
+	$> ./filtr ./examples/example-1.jpg ./examples/example-dthr.jpg dthr
+
+### edwn
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-edwn.jpg edwn
+
+### filtr
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-filtr.jpg filtr
+
 ### heathr
 
-### postr
+	$> ./filtr ./examples/example-1.jpg ./examples/example-2.jpg heathr dthr pxl ./examples/example-heathr.png
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-2.jpg heathr dthr pxl ./examples/example-heathr.jpg
+
+_Named after the ever fabulous [Heather Champ](http://www.hchamp.com/)._
 
 ### postcrd
 
+	$> ./filtr ./examples/example-1.jpg ./examples/example-postcrd.jpg postcrd
+
+### postr
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-postr.jpg postr
+
 ### pxl
 
-Apply [Will McCutchen's triangulizor](https://github.com/mccutchen/triangulizor) to  a photo.
+Apply [Will McCutchen's triangulizor](https://github.com/mccutchen/triangulizor)
+to an image.
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-pxl.jpg pxl
 
 ### rockstr
+
+	$> ./filtr ./examples/example-1.jpg ./examples/example-rockstr.jpg rockstr
 
 ### stndpipe
 
