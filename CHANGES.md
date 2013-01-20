@@ -8,11 +8,29 @@ filtr
 
 ### Comments
 
-* The new new. TBW.
+* The new new.
+
+### Additions
+
+* Added the `brdl`, `dthr`, `dthrpxl`, `edwn`, `pxl` and `pxldthr` filters.
+
+* Added `examples` folder full of ... examples.
+
+* Added a Makefile for Makefile-ish tasks.
+
+* Wrapper shell scripts for transferring EXIF and calculating MD5 sums.
 
 ### Updates
 
+* Finally moved all the individual filters in to separate "recipe" files.
+
 * The `stndpipe` filter no longer accepts filters (at least for now).
+
+* The `movr` filter has been removed (at least for now).
+
+* Switched to plain vanilla Markdown for CHANGES file.
+
+* Documentation now included in README.md
 
 0.5
 --
@@ -21,7 +39,7 @@ filtr
 
 ### Comments
 
-* The wandering years.
+* The wandering years. Best to disregard.
 
 0.4
 --
