@@ -18,3 +18,5 @@ filtred:
 	./filtr ./examples/soy-sauce.jpg ./examples/example-pxl.jpg pxl
 	./filtr ./examples/soy-sauce.jpg ./examples/example-pxldthr.jpg pxldthr
 	./filtr ./examples/soy-sauce.jpg ./examples/example-rockstr.jpg rockstr
+	./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg stndpipe ./examples/example-stndpipe.png
+	./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg stndpipe ./examples/example-stndpipe.jpg

@@ -18,9 +18,9 @@ All of the examples listed here are also included in the [examples]() folder.
 
 ### brdl
 
-James Bridle's [1 pixel camera](http://shorttermmemoryloss.com/portfolio/project/1-pixel-camera/)
-
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-brdl.jpg brdl
+
+_In honour of James Bridle's [1 pixel camera](http://shorttermmemoryloss.com/portfolio/project/1-pixel-camera/)._
 
 ### dazd
 
@@ -62,9 +62,6 @@ _Named after the ever fabulous [Heather Champ](http://www.hchamp.com/)._
 
 ### pxl
 
-Apply [Will McCutchen's triangulizor](https://github.com/mccutchen/triangulizor)
-to an image.
-
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-pxl.jpg pxl
 
 ### pxldthr
@@ -79,7 +76,13 @@ to an image.
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg ./examples/example-stndpipe.jpg stndpipe
 
+	$> ./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg ./examples/example-stndpipe.png stndpipe
+
 This is principally used by the `heathr` filtr.
+
+_These are not included in the `examples` folder because they're so big and it's
+sort of a waste. Take a look at the `example-heathr` images to get a sense of
+how it works._
 
 See also:
 ==

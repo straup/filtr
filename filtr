@@ -88,6 +88,9 @@ case $FILTER in
 	;;	
 	
     pxldthr)
+
+	# should this be put in a recipe... (20130120/straup)
+
 	${RECIPES}/pxl ${INPUT} ${OUTPUT}
 	${RECIPES}/dthr ${OUTPUT} ${OUTPUT}
 	;;
@@ -96,7 +99,7 @@ case $FILTER in
 
 	# pxl freaks out if INPUT and OUTPUT are the same
 	# should this be put in a recipe... (20130120/straup)
-	# 
+
 	ROOT=`dirname ${OUTPUT}`
 	FNAME=`basename ${OUTPUT}`
 	DP_TMP=${ROOT}/tmp-${FNAME}
