@@ -106,9 +106,9 @@ Dependencies
 See also:
 --
 
-* [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr) – the original blog post announcing filtr in 2006
+* [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr) – _the original blog post announcing filtr in 2006._
 
-* [Introducting Curvr](http://rcrowley.org/2007/11/08/introducing-curvr/)
+* [Introducting Curvr](http://rcrowley.org/2007/11/08/introducing-curvr.html) –  _Richard Crowley's variation on filtr, written in C._
 
 * [Loopr](https://github.com/straup/loopr)
 
