@@ -91,23 +91,22 @@ how it works._
 Dependencies
 --
 
-* Unix – or anything with the equivalent of the standard Unix shell tools
+* Unix – _or anything with the equivalent of the standard Unix shell tools._
 
 * [ImageMagick](http://www.imagemagick.org/) or [GraphicksMagick](http://www.graphicsmagick.org/)
 
 * [Python](http://www.python.org/)
 
-* [JHead](http://www.sentex.net/~mwandel/jhead/) – optional as there is a
-  (slower) pure-Python equivalent should that be necessary
+* [JHead](http://www.sentex.net/~mwandel/jhead/) – _optional as there is a
+  (slower) pure-Python equivalent should that be necessary._
 
-* The [Atkinson](https://github.com/migurski/atkinson) Python library – optional
-  as there is a (much slower) pure-Python equivalent should that be necessary
+* The [Atkinson](https://github.com/migurski/atkinson) Python library – _optional
+  as there is a (much slower) pure-Python equivalent should that be necessary._
 
 See also:
 --
 
-* [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr)
-  - the original blog post announcing filtr in 2006
+* [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr) – the original blog post announcing filtr in 2006
 
 * [Introducting Curvr](http://rcrowley.org/2007/11/08/introducing-curvr/)
 
