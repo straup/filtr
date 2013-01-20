@@ -108,3 +108,6 @@ rm -f ${ID}
 rm -f ${DRAFT}
 rm -f ${CANVAS}
 rm -f ${BG}
+
+echo "[{$FILTR}] done"
+exit

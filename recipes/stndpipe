@@ -35,8 +35,8 @@ FILTR_UID=`${UTILS}/md5sum ${INPUT1}`
 ID1="${TMP}/${FILTR_UID}-id.txt"
 ID2="${TMP}/${FILTR_UID}-id2.txt"
 
-CANVAS=${TMP}/${FILTR_UID}-blank.jpg
-DRAFT=${TMP}/${FILTR_UID}-draft.jpg
+CANVAS=${TMP}/${FILTR_UID}-blank.png
+DRAFT=${TMP}/${FILTR_UID}-draft.png
 
 ${IDENTIFY} ${INPUT1}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID1}
 W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID1}`
@@ -79,9 +79,14 @@ H_CANVAS=`awk "BEGIN { print ${BORDER_TOP} + ${H_NEW} + ${BORDER_BOTTOM} }"`
 
 echo "[${FILTR}] make canvas ({$CANVAS}) ${W_CANVAS} x ${H_CANVAS}"
 
-# sudo make me transparent if $OUTPUT ends in .png
+if [ `echo $OUTPUT | awk '/png$/ {print "PNG"}'` ]
+then
+    echo "[${FILTR}] create canvas with transparent background"
+    ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:none ${CANVAS}
+else
+    ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
+fi
 
-${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
 
 W_OFFSET=`awk "BEGIN { print ${W_ORIG} + ${BORDER_SIDES} + ${BORDER_CENTER} }"`
 
@@ -91,9 +96,10 @@ ${COMPOSITE} -quality 100 -geometry +${BORDER_SIDES}+${BORDER_TOP} ${INPUT1} ${C
 echo "[${FILTR}] ${COMPOSITE} -geometry +${W_OFFSET}+${BORDER_TOP} ${INPUT2} ${DRAFT} ${OUTPUT}"
 ${COMPOSITE} -quality 100 -geometry +${W_OFFSET}+${BORDER_TOP} ${INPUT2} ${DRAFT} ${OUTPUT}
 
-echo "[${FILTR}] done!"
-
 rm -f ${ID}
 rm -f ${ID2}
 rm -f ${CANVAS}
 rm -f ${DRAFT}
+
+echo "[${FILTR}] done"
+exit
