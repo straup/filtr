@@ -1,0 +1,110 @@
+#!/bin/sh
+
+if test $OSTYPE = "FreeBSD"
+then
+    WHOAMI=`realpath $0`
+elif [[ $OSTYPE == darwin* ]]
+then
+    WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
+else
+    WHOAMI=`readlink -f $0`    
+fi
+
+FILTR=`basename $WHOAMI`
+RECIPES=`dirname $WHOAMI`
+UTILS=`dirname $RECIPES`/utils
+
+INPUT=$1
+OUTPUT=$2
+
+CONVERT="convert"
+COMPOSITE="composite"
+IDENTIFY="identify"
+
+if test "`which gm`" != ""
+then
+    CONVERT="gm convert"
+    COMPOSITE="gm composite"
+    IDENTIFY="gm identify"
+fi
+
+TMP=`mktemp -d -t $FILTR-`
+
+FILTR_UID=`${UTILS}/md5sum ${INPUT}`
+
+ID="${TMP}/${FILTR_UID}-id.txt"
+CROPPED="${TMP}/${FILTR_UID}-crop.jpg"
+CANVAS=${TMP}/${FILTR_UID}-blank.jpg
+BG=${TMP}/${FILTR_UID}-bg.jpg
+DRAFT=${TMP}/${FILTR_UID}-draft.jpg
+          
+# Go!
+
+${IDENTIFY} ${INPUT} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+
+echo "[${FILTR}] img dimensions : ${W_IMG} x ${H_IMG}"
+
+# Pretty sure this isn't working correctly but it's a start
+# (20130120/straup)
+          
+CROP_TO=${W_IMG}
+CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
+CROP_Y=0
+          
+if [ ${W_IMG} -gt ${H_IMG} ]
+then
+    CROP_TO=${H_IMG}
+    CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
+    CROP_X=0
+fi
+    
+echo "[${FILTR}] ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${INPUT} ${CROPPED}"
+${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${INPUT} ${CROPPED}
+
+echo "[${FILTR}] ${IDENTIFY} ${CROPPED}"
+
+${IDENTIFY} ${CROPPED}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+
+BORDER_SIDES=`awk "BEGIN { print ${W_IMG} * .1 }"`
+BORDER_TOP=`awk "BEGIN { print ${H_IMG} * .1 }"`
+BORDER_BOTTOM=`awk "BEGIN { print ${H_IMG} * .3 }"`
+
+echo "[${FILTR}] img borders ${BORDER_SIDES} ; ${BORDER_TOP} ; ${BORDER_BOTTOM}"
+    
+W_CANVAS=`awk "BEGIN { print ${W_IMG} + (${BORDER_SIDES} * 2) }"`
+H_CANVAS=`awk "BEGIN { print ${BORDER_TOP} + ${H_IMG} + ${BORDER_BOTTOM} }"`
+
+echo "[${FILTR}] img canvas ${W_CANVAS} x ${H_CANVAS}"
+          
+echo "[${FILTR}] ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}"
+${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
+          
+# composite
+          
+echo "[${FILTR}] ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${CROPPED} ${CANVAS} ${DRAFT}"
+${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${CROPPED} ${CANVAS} ${DRAFT}
+
+# generate the background
+          
+W_BG=`awk "BEGIN { print ${W_CANVAS} + 2 }"`
+H_BG=`awk "BEGIN { print ${H_CANVAS} + 2 }"`
+
+echo "[${FILTR}] ${CONVERT} -size ${W_BG}x${H_BG} xc:black ${BG}"
+${CONVERT} -size ${W_BG}x${H_BG} xc:black ${BG}
+          
+# place the composite on the background
+          
+echo "[${FILTR}] ${COMPOSITE} -geometry +1+1 ${DRAFT} ${BG} ${CROPPED}"
+${COMPOSITE} -geometry +1+1 ${DRAFT} ${BG} ${OUTPUT}
+          
+# Clean up
+
+rm -f ${CROPPED}
+rm -f ${ID}
+rm -f ${DRAFT}
+rm -f ${CANVAS}
+rm -f ${BG}
