@@ -68,4 +68,12 @@ do
 
 done
 
-echo "DONE"
+echo "[${FILTR}] combine w/ stndpipe"  
+
+${RECIPES}/stndpipe ${TMP1} ${TMP2} ${OUTPUT}
+
+rm -f ${TMP1}
+rm -f ${TMP2}
+
+echo "[${FILTR}] done"
+exit
