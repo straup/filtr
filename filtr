@@ -63,12 +63,6 @@ do
   fi
 done
 
-if [ ! -f ${RECIPES}/${FILTER} ]
-then
-    echo "[startup] Can't find recipe for ${FILTER}, exiting"
-    exit
-fi
-
 echo "[startup] '${FILTER}' filter GO!"
 
 case $FILTER in
@@ -76,6 +70,7 @@ case $FILTER in
     heathr)
 	INPUT1=$1
 	INPUT2=$2
+	# $3 is 'heathr'
 	FILTR1=$4
 	FILTR2=$5
 	OUTPUT=$6
@@ -83,25 +78,33 @@ case $FILTER in
 	${RECIPES}/${FILTER} ${INPUT1} ${INPUT2} ${FILTR1} ${FILTR2} ${OUTPUT}
 	;;
 
-    stndpipe|edwn)
+    stndpipe)
 	INPUT1=$1
 	INPUT2=$2
-	OUTPUT=$3
+	# $3 is 'stndpipe'
+	OUTPUT=$4
 	
 	${RECIPES}/${FILTER} ${INPUT1} ${INPUT2} ${OUTPUT}
 	;;	
 	
     pxldthr)
-	${PYTHON} ${RECIPES}/pxl ${INPUT} ${OUTPUT}
-	${PYTHON} ${RECIPES}/dthr ${OUTPUT} ${OUTPUT}
+	${RECIPES}/pxl ${INPUT} ${OUTPUT}
+	${RECIPES}/dthr ${OUTPUT} ${OUTPUT}
 	;;
 
     dthrpxl)
-	${PYTHON} ${RECIPES}/dthr ${INPUT} ${OUTPUT}
-	${PYTHON} ${RECIPES}/pxl ${OUTPUT} ${OUTPUT}
+	${RECIPES}/dthr ${INPUT} ${OUTPUT}
+	${RECIPES}/pxl ${OUTPUT} ${OUTPUT}
 	;;
 
     *)
+
+	if [ ! -f ${RECIPES}/${FILTER} ]
+	then
+	    echo "[startup] Can't find recipe for ${FILTER}, exiting"
+	    exit
+	fi
+
 	${RECIPES}/${FILTER} ${INPUT} ${OUTPUT}
 	;;
 esac
@@ -110,7 +113,7 @@ echo "[startup] transfer exif data"
 
 case $FILTER in
 
-    heathr|stndpipe|edwn)
+    heathr|stndpipe)
 	echo "E_EXCESSIVE_EXIF: multiple input files"
 	;;
 

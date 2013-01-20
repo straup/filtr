@@ -3,25 +3,60 @@
 INPUT=$1
 OUTPUT=$2
 
+if test $OSTYPE = "FreeBSD"
+then
+    WHOAMI=`realpath $0`
+elif [[ $OSTYPE == darwin* ]]
+then
+    WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
+else
+    WHOAMI=`readlink -f $0`    
+fi
+
+FILTR=`basename $WHOAMI`
+RECIPES=`dirname $WHOAMI`
+UTILS=`dirname $RECIPES`/utils
+
+IDENTIFY="identify"
 CONVERT="convert"
 COMPOSITE="composite"
 
 if test "`which gm`" != ""
 then
+    IDENTIFY="gm identify"
     CONVERT="gm convert"
     COMPOSITE="gm composite"
 fi
 
-TMP=`mktemp -d -t filtr-`
-ID=${TMP}'/filtr.id'
+TMP=`mktemp -d -t ${FILTR}-`
 
+ID="${TMP}/${FILTR_UID}-id.txt"
+MASK="${TMP}/${FILTR_UID}-mask.jpg"
+LOMO="${TMP}/${FILTR_UID}-lomo.jpg"
+
+${IDENTIFY} ${INPUT} | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+
+W_ORIG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+H_ORIG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+
+W_THUMB=`awk '{ split($1, dims,"x"); print dims[1] / 10; }' ${ID}`
+H_THUMB=`awk '{ split($1, dims,"x"); print dims[2] / 10; }' ${ID}`
+
+echo "[${FILTR}] create mask"
 ${CONVERT} -size ${W_THUMB}x${H_THUMB} -contrast -gaussian 1x2 +matte ${INPUT} ${MASK}
 
+echo "[${FILTR}] scale mask"
 ${CONVERT} -resize ${W_ORIG}x${H_ORIG} -gaussian 0x5 -modulate 180,150 ${MASK} ${MASK}
 
+echo "[${FILTR}] scale lomo"
 ${CONVERT} -unsharp 1.5x1.5 -contrast -modulate 100,120 ${INPUT} ${LOMO}
 
-${COMPOSITE} -compose Multiply ${MASK} ${LOMO} ${NEW}
+echo "[${FILTR}] multiply"
+${COMPOSITE} -compose Multiply ${MASK} ${LOMO} ${OUTPUT}
 
-mv -f ${NEW} ${OUTPUT}
+rm -f ${ID}
+rm -f ${LOMO}
+rm -f ${MASK}
 
+echo "[${FILTR}] done"
+exit
