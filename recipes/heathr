@@ -72,12 +72,58 @@ do
         CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
         CROP_X=0
     fi
-
+    
     echo "[heathr] ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}"
     ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${img} ${img}
 
     echo "[heathr] ${IDENTIFY} ${img}"
-    # /heathr
+
+    ${IDENTIFY} ${img}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}
+    W_IMG=`awk '{ split($1, dims,"x"); print dims[1]; }' ${ID}`
+    H_IMG=`awk '{ split($1, dims,"x"); print dims[2]; }' ${ID}`
+
+    BORDER_SIDES=`awk "BEGIN { print ${W_IMG} * .1 }"`
+    BORDER_TOP=`awk "BEGIN { print ${H_IMG} * .1 }"`
+    BORDER_BOTTOM=`awk "BEGIN { print ${H_IMG} * .3 }"`
+
+    echo "[${FILTER}][heathr] img borders ${BORDER_SIDES} ; ${BORDER_TOP} ; ${BORDER_BOTTOM}"
+          
+    W_CANVAS=`awk "BEGIN { print ${W_IMG} + (${BORDER_SIDES} * 2) }"`
+    H_CANVAS=`awk "BEGIN { print ${BORDER_TOP} + ${H_IMG} + ${BORDER_BOTTOM} }"`
+          
+    echo "[heathr] img canvas ${W_CANVAS} x ${H_CANVAS}"
+          
+    CANVAS=${TMP}/${FILTR_UID}-blank.jpg
+    BG=${TMP}/${FILTR_UID}-bg.jpg
+    DRAFT=${TMP}/${FILTR_UID}-draft.jpg
+          
+    echo "[heathr] ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}"
+    ${CONVERT} -size ${W_CANVAS}x${H_CANVAS} xc:white ${CANVAS}
+          
+    # composite
+          
+    echo "[heathr] ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${img} ${CANVAS} ${DRAFT}"
+    ${COMPOSITE} -geometry +${BORDER_SIDES}+${BORDER_TOP} ${img} ${CANVAS} ${DRAFT}
+
+    # generate the background
+          
+    W_BG=`awk "BEGIN { print ${W_CANVAS} + 2 }"`
+    H_BG=`awk "BEGIN { print ${H_CANVAS} + 2 }"`
+
+    echo "[heathr] ${CONVERT} -size ${W_BG}x${H_BG} xc:black ${BG}"
+    ${CONVERT} -size ${W_BG}x${H_BG} xc:black ${BG}
+          
+    # place the composite on the background
+          
+    echo "[heathr] ${COMPOSITE} -geometry +1+1 ${DRAFT} ${BG} ${img}"
+    ${COMPOSITE} -geometry +1+1 ${DRAFT} ${BG} ${img}         
+          
+    rm -f ${ID}
+    rm -f ${DRAFT}
+    rm -f ${CANVAS}
+    rm -f ${BG}
+
+    echo "[heathr] polaroid ${img}"
 
 done
 
