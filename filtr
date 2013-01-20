@@ -93,8 +93,18 @@ case $FILTER in
 	;;
 
     dthrpxl)
-	${RECIPES}/dthr ${INPUT} ${OUTPUT}
-	${RECIPES}/pxl ${OUTPUT} ${OUTPUT}
+
+	# pxl freaks out if INPUT and OUTPUT are the same
+	# should this be put in a recipe... (20130120/straup)
+	# 
+	ROOT=`dirname ${OUTPUT}`
+	FNAME=`basename ${OUTPUT}`
+	DP_TMP=${ROOT}/tmp-${FNAME}
+
+	${RECIPES}/dthr ${INPUT} ${DP_TMP}
+	${RECIPES}/pxl ${DP_TMP} ${OUTPUT}
+	
+	rm -f ${DP_TMP}
 	;;
 
     *)

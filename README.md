@@ -72,3 +72,5 @@ See also:
   - the original blog post announcing filtr in 2006
 
 * [Photos that have been filtr-ed on Flickr](http://www.flickr.com/photos/tags/filtr:process=)
+
+* [Loopr](https://github.com/straup/loopr)
