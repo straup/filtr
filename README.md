@@ -3,8 +3,8 @@ filtr
 
 filtr is a command-line tool for applying filters to pictures.
 
-filtr is a wrapper around a lot of smaller pieces most notably [ImageMagick]()
-or [GraphicksMagick](), neither of which are very small.
+filtr is a wrapper around a lot of smaller pieces most notably [ImageMagick](http://www.imagemagick.org/)
+or [GraphicksMagick](http://www.graphicsmagick.org/), neither of which are very small.
 
 Individual filters are defined as "recipes" (which can be invoked on their own)
 and all the `filtr` script does is some basic housekeeping around calling them,
@@ -13,6 +13,8 @@ filtered version.
 
 filters
 --
+
+All of the examples listed here are also included in the [examples]() folder.
 
 ### brdl
 
@@ -28,9 +30,15 @@ James Bridle's [1 pixel camera](http://shorttermmemoryloss.com/portfolio/project
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-dthr.jpg dthr
 
+### dthrpxl
+
+	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-dthrpxl.jpg dthrpxl
+
 ### edwn
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-edwn.jpg edwn
+
+This is principally used by the `heathr` filtr.
 
 ### filtr
 
@@ -59,11 +67,19 @@ to an image.
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-pxl.jpg pxl
 
+### pxldthr
+
+	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-pxldthr.jpg pxldthr
+
 ### rockstr
 
 	$> ./filtr ./examples/soy-sauce.jpg ./examples/example-rockstr.jpg rockstr
 
 ### stndpipe
+
+	$> ./filtr ./examples/soy-sauce.jpg ./examples/oysters.jpg ./examples/example-stndpipe.jpg stndpipe
+
+This is principally used by the `heathr` filtr.
 
 See also:
 ==
@@ -71,6 +87,8 @@ See also:
 * [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr)
   - the original blog post announcing filtr in 2006
 
-* [Photos that have been filtr-ed on Flickr](http://www.flickr.com/photos/tags/filtr:process=)
+* [Introducting Curvr](http://rcrowley.org/2007/11/08/introducing-curvr/)
 
 * [Loopr](https://github.com/straup/loopr)
+
+* [Photos that have been filtr-ed on Flickr](http://www.flickr.com/photos/tags/filtr:process=)
