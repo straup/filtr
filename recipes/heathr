@@ -8,7 +8,16 @@ OUTPUT=$5
 
 # FIX ME: do absrealpath dance
 
-WHOAMI=$0 
+if test $OSTYPE = "FreeBSD"
+then
+    WHOAMI=`realpath $0`
+elif [[ $OSTYPE == darwin* ]]
+then
+    WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
+else
+    WHOAMI=`readlink -f $0`    
+fi
+
 RECIPES=`dirname $WHOAMI`
 UTILS=`dirname $RECIPES`/utils
 
@@ -24,6 +33,7 @@ then
 fi
 
 TMP=`mktemp -d -t stndpip-`
+
 FILTR_UID=`${UTILS}/md5sum ${INPUT1}`
 
 ID="${TMP}/${FILTR_UID}-id.txt"
@@ -38,10 +48,8 @@ CROP2="${TMP}/${FILTR_UID}-crop2.jpg"
 
 # Run the filters
 
-echo "${RECIPES}/${FILTR1} ${INPUT1} ${TMP1}"
-echo "${RECIPES}/${FILTR2} ${INPUT2} ${TMP2}"
-
-exit
+${RECIPES}/${FILTR1} ${INPUT1} ${TMP1}
+${RECIPES}/${FILTR2} ${INPUT2} ${TMP2}
 
 # Crop the images
 
@@ -58,7 +66,7 @@ do
     CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
     CROP_Y=0
           
-    if [${W_IMG} -gt ${H_IMG}]
+    if [ ${W_IMG} -gt ${H_IMG} ]
     then
         CROP_TO=${H_IMG}
         CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
@@ -70,7 +78,7 @@ do
 
     echo "[heathr] ${IDENTIFY} ${img}"
     # /heathr
-    fi
+
 done
 
 echo "DONE"
