@@ -103,7 +103,19 @@ Dependencies
 * The [Atkinson](https://github.com/migurski/atkinson) Python library – _optional
   as there is a (much slower) pure-Python equivalent should that be necessary._
 
-See also:
+Contributors
+--
+
+* [Grant Hollingworth](http://antiflux.org/~grant/)
+
+License
+--
+
+Copyright (c) 2005-2013 Aaron Straup Cope. All Rights Reserved.
+
+This is free software. You may use it and distribute it under [the same terms as Perl itself](http://dev.perl.org/licenses/artistic.html).
+
+See also
 --
 
 * [Ladies and gentlemen : filtr](http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr) – _the original blog post announcing filtr in 2006._
