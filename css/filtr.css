@@ -53,6 +53,10 @@ q {
     max-width:1200px;
 }
 
+#examples a {
+    color: blue !important;
+}
+
 #examples img {
     max-width: 300px;
     margin-bottom: 10px;
