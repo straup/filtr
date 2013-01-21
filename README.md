@@ -113,3 +113,5 @@ See also:
 * [Loopr](https://github.com/straup/loopr)
 
 * [Photos that have been filtr-ed on Flickr](http://www.flickr.com/photos/tags/filtr:process=)
+
+* Older versions of filtr can be found at [http://aaronland.info/bin/filtr/](http://aaronland.info/bin/filtr/)
