@@ -14,7 +14,7 @@ filtered version.
 Filters
 --
 
-All of the examples listed here are also included in the [examples]() folder.
+All of the examples listed here are also included in the [examples](./examples) folder.
 
 ### brdl
 
