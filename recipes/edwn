@@ -50,16 +50,16 @@ echo "[${FILTR}] img dimensions : ${W_IMG} x ${H_IMG}"
 # (20130120/straup)
           
 CROP_TO=${W_IMG}
-CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
-CROP_Y=0
+CROP_X=0
+CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
           
 if [ ${W_IMG} -gt ${H_IMG} ]
 then
     CROP_TO=${H_IMG}
-    CROP_Y=`awk "BEGIN { print ${H_IMG} - ${W_IMG} }"`
-    CROP_X=0
+    CROP_Y=0
+    CROP_X=`awk "BEGIN { print ${W_IMG} - ${H_IMG} }"`
 fi
-    
+
 echo "[${FILTR}] ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${INPUT} ${CROPPED}"
 ${CONVERT} -crop ${CROP_TO}x${CROP_TO}+${CROP_X}+${CROP_Y} ${INPUT} ${CROPPED}
 
