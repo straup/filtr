@@ -12,16 +12,35 @@
 
       <h1>this is filtr</h1>
 
+      <blockquote>
+
           <p style="font-weight: 700;">filtr is a command-line tool for applying filters to pictures.</p>
 
-	  <p>filtr is a wrapper around a lot of smaller pieces most notably ImageMagick or GraphicksMagick, neither of which are very small. Individual filters are defined as "recipes" (which can be invoked on their own) and all the filtr script does is some basic housekeeping around calling them, including things like transferring EXIF data from a source image to the newly filtered version.</p>
-        </section>
+	  <p><strong>filtr</strong> is a wrapper around a lot of smaller pieces most notably ImageMagick or GraphicksMagick, neither of which are very small. Individual filters are defined as "recipes" (which can be invoked on their own) and all the filtr script does is some basic housekeeping around calling them, including things like transferring EXIF data from a source image to the newly filtered version.</p>
+
+	  <p><strong>filtr</strong> began life in 2005. A few months later when I made it public <a href="http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr">I explained that</a>:</p>
+
+	  <blockquote>
+	    <p><q>Shortly after I arrived in Vancouver, in 2005, I stopped using my digital camera. I put it in a box and mailed it to a friend back home. Having never owned a cell phone prior to leaving Montréal, I had quickly discovered that being able to "moblog" was what I had been waiting for all along (despite an on-going dislike of the term itself).</q></p>
+
+	    <p><q>Plus, it wasn't as though I was ever pleased with the photos my so-called proper camera took. During the two years that I used it there wasn't a single photo published that wasn't cropped or tweaked or kicked in the gut. The only wonder is why it took so long to do the same for my camera phone pictures.</q></p>
+
+	    <p><q>Long story short : it took until September before I sat on the floor of my apartment, one Saturday morning, and just cranked it out. I grabbed a copy of the creating a Lomo filter with Image Magick script that's been floating around forever and used it as a template to try and teach the camera on the <a href="http://www.flickr.com/cameras/nokia/6630/">Nokia 6630</a> to sing. There was no science in my effort, only art and experimentation and the surprise at the end of each photo.</q></p>
+	  </blockquote>
+
+	  <p>Or as <a href="http://www.hchamp.com/">Heather Champ</a> put it so very well, once: <q>This technology thing is what you make of it.</q><p>
+
+	  <p>This version (1.0) of <strong>filtr</strong> could have been code-named <q>CLEAN UP YOUR ROOM</q>. There are a couple of new filters (notably <code>dthr</code> and <code>pxl</code>) but mostly it is some long overdue housekeeping that will make it easier to teach the program new tricks in the future, not to mention some of the tricks that people have learned since 2005.</p>
+
+	  <p>You can follow along <a href="https://github.com/straup/filtr">on Github</a>.</p>
 
 	<div id="examples">
 
+	  <h2>Examples</h2>
+
         <ul>
-	  <li><img src="images/soy-sauce.jpg"></li>
-	  <li><img src="images/oysters.jpg"></li>
+	  <li><img src="images/soy-sauce.jpg"><br /><span style="font-style:italic;">example image #1</span></li>
+	  <li><img src="images/oysters.jpg"><br /><span style="font-style:italic;">example image #2</span></li>
 	</ul>
 
         <ul>
@@ -29,21 +48,28 @@
 	  <li><img src="images/example-dazd.jpg" /><br />dazd</li>
 	  <li><img src="images/example-dthr.jpg" /><br />dthr</li>
 	  <li><img src="images/example-dthrpxl.jpg" /><br />dthrpxl</li>	  
-	  <li><img src="images/example-edwn.jpg" /><br />edwn</li>
-	  <li><img src="images/example-heathr.jpg" /><br />heathr</li>
 	  <li><img src="images/example-postcrd.jpg" /><br />postcrd</li>
 	  <li><img src="images/example-postr.jpg" /><br />postr</li>
 	  <li><img src="images/example-pxl.jpg" /><br />pxl</li>
 	  <li><img src="images/example-pxldthr.jpg" /><br />pxldthr</li>
 	  <li><img src="images/example-rockstr.jpg" /><br />rockstr</li>
+	</ul>
+
+	<br clear="all" />
+
+	<h2>Fancy-pants Examples</h2>
+
+	<ul >
 	  <li><img src="images/example-stndpipe.jpg" /><br />stndpipe</li>
+	  <li><img src="images/example-edwn.jpg" style="max-height: 224px !important; margin-left:18px;" /><br />edwn</li>
+	  <li><img src="images/example-heathr.jpg" style="max-width: 385px; !important;margin-left:7px;" /><br />heathr</li>
 	</ul>
 
 	<br clear="all" />
 	</div>
 
 	<div id="footer">
-	  <p>filtr is a thing by <a href="">aaron straup cope</a></p>
+	  <p><strong>filtr</strong> is a thing by <a href="http://www.aaronstraupcope.com/">aaron straup cope</a>.</p>
 	</div>
 
       </div>
