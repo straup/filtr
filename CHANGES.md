@@ -1,10 +1,19 @@
 filtr
 ==
 
-1.0
+1.0.1
 --
 
-2013
+2013-01-25
+
+### Updates
+
+* Lots of little shell tweaks to make it work on a raspberry pi.
+
+1.0.0
+--
+
+2013-01-21
 
 ### Comments
 
