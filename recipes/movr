@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "WHY ARE YOU TRYING TO RUN THIS????"
+exit
+
     MOVR=$4
     IDENT=${FILTR_UID}"-ffmpeg"
     TMP_FMT=${FILTR_UID}"-fr%02d.jpg"

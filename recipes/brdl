@@ -3,6 +3,7 @@
 INPUT=$1
 OUTPUT=$2
 
+FILTR=`basename $0`
 CONVERT="convert"
 IDENTIFY="identify"
 
@@ -12,7 +13,13 @@ then
     IDENTIFY="gm identify"
 fi
 
-TMP=`mktemp -d -t brdl-`
+if test $OSTYPE = linux
+then
+    TMP=`mktemp -d -t ${FILTR}-XXXXX-`
+else
+    TMP=`mktemp -d -t $FILTR-`
+fi
+
 ID=${TMP}'/brdl.tmp'
 
 ${IDENTIFY} ${INPUT}  | awk '{ split($3,a,"+"); print a[1]; }' > ${ID}

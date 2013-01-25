@@ -6,7 +6,7 @@ OUTPUT=$2
 if test $OSTYPE = "FreeBSD"
 then
     WHOAMI=`realpath $0`
-elif [[ $OSTYPE == darwin* ]]
+elif test $OSTYPE = darwin*
 then
     WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
 else
@@ -28,7 +28,13 @@ then
     IDENTIFY="gm identify"
 fi
 
-TMP=`mktemp -d -t postcrd-`
+if test $OSTYPE = linux
+then
+    TMP=`mktemp -d -t ${FILTR}-XXXXX-`
+else
+    TMP=`mktemp -d -t $FILTR-`
+fi
+
 FILTR_UID=`${UTILS}/md5sum ${INPUT}`
 
 ID="${TMP}/${FILTR_UID}-id.txt"
