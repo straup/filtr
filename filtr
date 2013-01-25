@@ -31,15 +31,7 @@ OS=`uname`
 echo "[startup] ${NAME} ${VERSION}"
 # echo "[startup] ${OS} ${PATH}"
 
-if test $OSTYPE = "FreeBSD"
-then
-    WHOAMI=`realpath $0`
-elif test $OSTYPE = "darwin"
-then
-    WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
-else
-    WHOAMI=`readlink -f $0`    
-fi
+WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
 
 UTILS=`dirname $WHOAMI`/utils
 RECIPES=`dirname $WHOAMI`/recipes
