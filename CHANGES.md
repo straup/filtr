@@ -1,6 +1,15 @@
 filtr
 ==
 
+1.0.2
+--
+
+2013-01-25
+
+### Updates
+
+* Shells are weird; try to fix the most egregious bits for OS X...
+
 1.0.1
 --
 
