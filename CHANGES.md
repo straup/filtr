@@ -1,6 +1,15 @@
 filtr
 ==
 
+1.0.3
+--
+
+2013-01-25
+
+### Updates
+
+* Just use Python for all attempts to figure out WHOAMI
+
 1.0.2
 --
 
